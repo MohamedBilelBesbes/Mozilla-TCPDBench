@@ -14,6 +14,9 @@ Author: G.J.J. van den Burg
 Copyright (c) 2020 - The Alan Turing Institute
 License: See the LICENSE file.
 
+Modified by: Simon Trapp
+Date: 2021-08-25
+
 """
 
 import argparse
@@ -25,10 +28,7 @@ import termcolor
 
 from enum import Enum
 from typing import Optional
-
-# from pydantic.dataclasses import dataclass
 from dataclasses import dataclass
-
 from latex import build_latex_table
 
 colorama.init()
@@ -48,47 +48,7 @@ class Experiment(Enum):
 
 class Dataset(Enum):
     apple = "apple"
-    bank = "bank"
-    bee_waggle_6 = "bee_waggle_6"
-    bitcoin = "bitcoin"
-    brent_spot = "brent_spot"
-    businv = "businv"
-    centralia = "centralia"
-    children_per_woman = "children_per_woman"
-    co2_canada = "co2_canada"
-    construction = "construction"
-    debt_ireland = "debt_ireland"
-    gdp_argentina = "gdp_argentina"
-    gdp_croatia = "gdp_croatia"
-    gdp_iran = "gdp_iran"
-    gdp_japan = "gdp_japan"
-    global_co2 = "global_co2"
-    homeruns = "homeruns"
-    iceland_tourism = "iceland_tourism"
-    jfk_passengers = "jfk_passengers"
-    lga_passengers = "lga_passengers"
-    nile = "nile"
-    occupancy = "occupancy"
-    ozone = "ozone"
-    quality_control_1 = "quality_control_1"
-    quality_control_2 = "quality_control_2"
-    quality_control_3 = "quality_control_3"
-    quality_control_4 = "quality_control_4"
-    quality_control_5 = "quality_control_5"
-    rail_lines = "rail_lines"
-    ratner_stock = "ratner_stock"
-    robocalls = "robocalls"
-    run_log = "run_log"
-    scanline_126007 = "scanline_126007"
-    scanline_42049 = "scanline_42049"
-    seatbelts = "seatbelts"
-    shanghai_license = "shanghai_license"
-    uk_coal_employ = "uk_coal_employ"
-    measles = "measles"
-    unemployment_nl = "unemployment_nl"
-    us_population = "us_population"
-    usd_isk = "usd_isk"
-    well_log = "well_log"
+    # TODO: add your datasets!
 
 
 class Method(Enum):
@@ -106,28 +66,11 @@ class Method(Enum):
     segneigh = "segneigh"
     wbs = "wbs"
     zero = "zero"
+    mongodb = "mongodb"
 
-
-# Methods that support multidimensional datasets
-MULTIMETHODS = [
-    Method.bocpd,
-    Method.bocpdms,
-    Method.ecp,
-    Method.kcpa,
-    Method.rbocpdms,
-    Method.zero,
-]
-
-# Multidimensional datasets
-MULTIDATASETS = [
-    Dataset.apple,
-    Dataset.bee_waggle_6,
-    Dataset.occupancy,
-    Dataset.run_log,
-]
 
 # Datasets with missing values
-MISSING_DATASETS = [Dataset.uk_coal_employ]
+MISSING_DATASETS = []
 
 # Methods that handle missing values
 MISSING_METHODS = [
@@ -143,7 +86,6 @@ MISSING_METHODS = [
 class Result:
     dataset: Dataset
     experiment: Experiment
-    is_multidim: bool
     method: Method
     metric: Metric
     score: Optional[float]
@@ -177,7 +119,7 @@ def parse_args():
         "-d",
         "--dim",
         help="Dimensionality",
-        choices=["uni", "multi", "combined"],
+        choices=["uni", "combined"],
         required=True,
     )
     parser.add_argument(
@@ -212,7 +154,7 @@ def extract_score(method_results, metric=None, experiment=None):
 
     if not isinstance(metric, Metric):
         raise ValueError("Unknown metric: %s" % metric)
-    if not experiment in ["default", "best"]:
+    if experiment not in ["default", "best"]:
         raise ValueError("Unknown experiment: %s" % experiment)
 
     # Collect all values for the chosen metric
@@ -240,7 +182,7 @@ def collect_results(summary_dir=None, metric=None, experiment=None):
     """
     if not isinstance(metric, Metric):
         raise ValueError("Unknown metric: %s" % metric)
-    if not experiment in ["default", "best"]:
+    if experiment not in ["default", "best"]:
         raise ValueError("Unknown experiment: %s" % experiment)
     if not os.path.isdir(summary_dir):
         raise FileNotFoundError(summary_dir)
@@ -252,8 +194,6 @@ def collect_results(summary_dir=None, metric=None, experiment=None):
 
         dataset_name = summary_data["dataset"]
         summary_results = summary_data["results"]
-
-        is_multi = summary_data["dataset_ndim"] > 1
 
         for method in summary_results:
             # method names are prefixed with the experiment type, so we skip
@@ -268,13 +208,13 @@ def collect_results(summary_dir=None, metric=None, experiment=None):
             )
 
             # strip the experiment from the method name
-            method_name = method[len(experiment + "_") :]
+            method_name = method[len(experiment + "_"):]
 
             # determine the placeholder value if there is no score.
             placeholder = set()
             if score is None:
                 if (Dataset(dataset_name) in MISSING_DATASETS) and (
-                    not Method(method_name) in MISSING_METHODS
+                        not Method(method_name) in MISSING_METHODS
                 ):
                     # dataset has missing values and method can't handle it
                     placeholder.add("M")
@@ -290,7 +230,6 @@ def collect_results(summary_dir=None, metric=None, experiment=None):
             res = Result(
                 dataset=Dataset(dataset_name),
                 experiment=Experiment(experiment),
-                is_multidim=is_multi,
                 method=Method(method_name),
                 metric=Metric(metric),
                 score=score,
@@ -308,10 +247,8 @@ def average_results(results):
     insufficient results.
     """
     experiment = list(set(r.experiment for r in results))[0]
-    # determine if we're dealing with multidimensional datasets
-    is_multi = all(r.is_multidim for r in results)
 
-    expected_methods = MULTIMETHODS if is_multi else list(Method)
+    expected_methods = list(Method)
 
     # keep only expected methods
     results = list(filter(lambda r: r.method in expected_methods, results))
@@ -384,12 +321,8 @@ def write_latex(results, dim=None, is_avg=None):
     methods = sorted(set(r.method.name for r in results))
     datasets = sorted(set(r.dataset.name for r in results))
     if dim == "combined":
-        uni_datasets = [
-            d.name for d in list(Dataset) if not d in MULTIDATASETS
-        ]
-        multi_datasets = [d.name for d in MULTIDATASETS]
-        datasets = sorted(uni_datasets) + sorted(multi_datasets)
-        first_multi = sorted(multi_datasets)[0]
+        uni_datasets = [d.name for d in list(Dataset)]
+        datasets = sorted(uni_datasets)
 
     textsc = lambda m: "\\textsc{%s}" % m
     verb = lambda m: "\\verb+%s+" % m
@@ -415,8 +348,6 @@ def write_latex(results, dim=None, is_avg=None):
         lines = tex.split("\n")
         newlines = []
         for line in lines:
-            if line.startswith(verb(first_multi)):
-                newlines.append("\\hline")
             newlines.append(line)
         tex = "\n".join(newlines)
 
@@ -433,13 +364,6 @@ def main():
         metric=Metric(args.metric),
         experiment=args.experiment,
     )
-
-    if args.dim == "uni":
-        # filter out multi
-        results = list(filter(lambda r: not r.is_multidim, results))
-    elif args.dim == "multi":
-        # filter out uni
-        results = list(filter(lambda r: r.is_multidim, results))
 
     if args.type == "avg":
         results = average_results(results)

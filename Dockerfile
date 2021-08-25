@@ -21,7 +21,7 @@ RUN apt-get update && \
 		libfreetype6-dev \
 		libv8-dev
 
-# Make sure python means python3
+# TODO: install python 3.9 and make sure python means python3.9!
 RUN apt-get install -y --no-install-recommends \
 	python3 \
 	python3-dev \
@@ -35,19 +35,11 @@ RUN apt-get install -y --no-install-recommends \
 	cd /usr/local/bin && ln -s /usr/bin/pip3 pip && \
     pip install virtualenv abed wheel
 
-# Set the default shell to bash
-RUN mv /bin/sh /bin/sh.old && cp /bin/bash /bin/sh
-
-# Clone the dataset repo
-RUN git clone https://github.com/alan-turing-institute/TCPD
-
-# Build the dataset
-RUN cd TCPD && make export
-
 # Clone the repo
-RUN git clone --recurse-submodules https://github.com/alan-turing-institute/TCPDBench
+RUN git clone --recurse-submodules https://github.com/simontrapp/TCPDBench
 
-# Copy the datasets into the benchmark dir
+# TODO: COPY the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
+# TODO: create analysis/output/summaries/
 RUN mkdir -p /TCPDBench/datasets && cp TCPD/export/*.json /TCPDBench/datasets/
 
 # Install Python dependencies

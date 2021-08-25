@@ -1,36 +1,10 @@
 # Turing Change Point Detection Benchmark
 
-[![Reproducible Research](https://github.com/alan-turing-institute/TCPDBench/workflows/Reproducible%20Research/badge.svg)](https://github.com/alan-turing-institute/TCPDBench/actions?query=workflow%3A%22Reproducible+Research%22)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3740582.svg)](https://doi.org/10.5281/zenodo.3740582)
-
-Welcome to the repository for the Turing Change Point Detection Benchmark, a 
-benchmark evaluation of change point detection algorithms developed at [The 
-Alan Turing Institute](https://turing.ac.uk). This benchmark uses the time 
-series from the [Turing Change Point 
-Dataset](https://github.com/alan-turing-institute/TCPD) (TCPD).
-
-**Useful links:**
-- [Turing Change Point Detection 
-  Benchmark](https://github.com/alan-turing-institute/TCPDBench)
-- [Turing Change Point Dataset](https://github.com/alan-turing-institute/TCPD)
-- [An Evaluation of Change Point Detection Algorithms](https://arxiv.org/abs/2003.06222) by 
-  [Gertjan van den Burg](https://gertjan.dev) and [Chris 
-  Williams](https://homepages.inf.ed.ac.uk/ckiw/).
-- [Annotation Tool](https://github.com/alan-turing-institute/annotatechange)
-
-If you encounter a problem when using this repository or simply want to ask a 
-question, please don't hesitate to [open an issue on 
-GitHub](https://github.com/alan-turing-institute/TCPDBench/issues) or send an 
-email to ``gertjanvandenburg at gmail dot com``.
-
-## Introduction
-
 Change point detection focuses on accurately detecting moments of abrupt 
 change in the behavior of a time series. While many methods for change point 
 detection exist, past research has paid little attention to the evaluation of 
 existing algorithms on real-world data. This work introduces a benchmark study 
-and a dataset ([TCPD](https://github.com/alan-turing-institute/TCPD)) that are 
-explicitly designed for the evaluation of change point detection algorithms. 
+and a dataset that are explicitly designed for the evaluation of change point detection algorithms. 
 We hope that our work becomes a proving ground for the comparison and 
 development of change point detection algorithms that work well in practice.
 
@@ -72,101 +46,8 @@ machine or use the provided Dockerfile (see below). If you don't use Docker,
 first clone this repository using:
 
 ```
-$ git clone --recurse-submodules https://github.com/alan-turing-institute/TCPDBench
+$ git clone --recurse-submodules https://github.com/simontrapp/TCPDBench
 ```
-
-### Generating Tables/Figures
-
-Generating the tables and figures from the paper is done through the scripts 
-in ``analysis/scripts`` and can be run through the provided ``Makefile``. 
-
-First make sure you have all requirements:
-
-```
-$ pip install -r ./analysis/requirements.txt
-```
-
-and then use make:
-
-```
-$ make results
-```
-
-The results will be placed in ``./analysis/output``. Note that to generate the 
-figures a working LaTeX and ``latexmk`` installation is needed.
-
-### Reproducing the experiments
-
-To fully reproduce the experiments, some additional steps are needed. Note 
-that the Docker procedure outlined below automates this process somewhat.
-
-First, obtain the [Turing Change Point 
-Dataset](https://github.com/alan-turing-institute/TCPD) and follow the 
-instructions provided there. Copy the dataset files to a ``datasets`` 
-directory in this repository.
-
-To run all the tasks we use the [abed](https://github.com/GjjvdBurg/abed) 
-command line tool. This allows us to define the experiments in a single 
-configuration file (``abed_conf.py``) and makes it easy to keep track of which 
-tasks still need to be run.
-
-Note that this repository contains all the result files, so it is not 
-necessary to redo all the experiments. If you still wish to do so, the 
-instructions are as follows:
-
-1. Move the current result directory out of the way:
-
-   ```
-   $ mv abed_results old_abed_results
-   ```
-
-2. Install [abed](https://github.com/GjjvdBurg/abed). This requires an 
-   existing installation of openmpi, but otherwise should be a matter of 
-   running:
-
-   ```
-   $ pip install abed
-   ```
-
-3. Tell abed to rediscover all the tasks that need to be done:
-
-   ```
-   $ abed reload_tasks
-   ```
-
-   This will populate the ``abed_tasks.txt`` file and will automatically 
-   commit the updated file to the Git repository. You can show the number of 
-   tasks that need to be completed through:
-
-   ```
-   $ abed status
-   ```
-
-4. Initialize the virtual environments for Python and R, which installs all 
-   required dependencies:
-
-   ```
-   $ make venvs
-   ```
-
-   Note that this will also create an R virtual environment (using 
-   [RSimpleVenv](https://github.com/GjjvdBurg/RSimpleVenv)), which ensures 
-   that the exact versions of the packages used in the experiments will be 
-   installed. This step can take a little while (:coffee:), but is important 
-   to ensure reproducibility.
-
-5. Run abed through ``mpiexec``, as follows:
-
-   ```
-   $ mpiexec -np 4 abed local
-   ```
-
-   This will run abed using 4 cores, which can of course be increased or 
-   decreased if desired. Note that a minimum of two cores is needed for abed 
-   to operate. You may want to run these experiments in parallel on a large 
-   number of cores, as the expected runtime is on the order of 21 days on a 
-   single core. Once this command starts running the experiments you will see 
-   result files appear in the ``staging`` directory.
 
 ### Running the experiments with Docker
 
@@ -175,43 +56,18 @@ and dependencies, you can do so easily with the provided Dockerfile. You can
 build the Docker image using:
 
 ```
-$ docker build -t alan-turing-institute/tcpdbench github.com/alan-turing-institute/TCPDBench
+# TODO: add the datasets/*.json and analysis/annotations/annotations.json, edit the DATASETS in abed_conf.py and modifiy dataset enum in analysis/scripts/make_table.py
+$ docker build -t tcpdbench .
+# make results persist to host
+$ mkdir docker_results
+$ docker volume create --driver local --opt type=none --opt device=./docker_results --opt o=bind tcpdbench_vol
+# OPTION 1: reproduce figures
+$ docker run -i -t -v tcpdbench_vol:/TCPDBench tcpdbench /bin/bash -c "make results"
+# OPTION 2: reproduce all experiments (-np sets number of threads)
+$ docker run -i -t -v tcpdbench_vol:/TCPDBench tcpdbench /bin/bash -c "mv abed_results old_abed_results && mkdir abed_results && abed reload_tasks && abed status && make venvs && mpiexec --allow-run-as-root -np 4 abed local && make results"
 ```
-
-To ensure that the results created in the docker container persist to the 
-host, we need to create a volume first (following [these 
-instructions](https://stackoverflow.com/a/47528568/1154005)):
-
-```
-$ mkdir /path/to/tcpdbench/results     # *absolute* path where you want the results
-$ docker volume create --driver local \
-                       --opt type=none \
-                       --opt device=/path/to/tcpdbench/results \
-                       --opt o=bind tcpdbench_vol
-```
-
-You can then follow the same procedure as described above to reproduce the 
-experiments, but using the relevant docker commands to run them in the 
-container:
-
-* For reproducing just the tables and figures, use:
-  ```
-  $ docker run -i -t -v tcpdbench_vol:/TCPDBench alan-turing-institute/tcpdbench /bin/bash -c "make results"
-  ```
-
-* For reproducing all the experiments, use:
-  ```
-  $ docker run -i -t -v tcpdbench_vol:/TCPDBench alan-turing-institute/tcpdbench /bin/bash -c "mv abed_results old_abed_results && mkdir abed_results && abed reload_tasks && abed status && make venvs && mpiexec --allow-run-as-root -np 4 abed local && make results"
-  ```
-  where ``-np 4`` sets the number of cores used for the experiments to four. 
-  This can be changed as desired to increase efficiency.
-
 
 ## Extending the Benchmark
-
-It should be relatively straightforward to extend the benchmark with your own 
-methods and datasets. Remember to [cite our 
-paper](https://arxiv.org/abs/2003.06222) if you do end up using this work.
 
 ### Adding a new method
 
@@ -238,58 +94,6 @@ arguments where ``-i/--input`` marks the path to a dataset file and optionally
 can take further command line arguments for hyperparameter settings. 
 Specifying these items from the command line facilitates reproducibility.
 
-Roughly, the main function of a Python method could look like this:
-
-```python
-# Adding a new Python method to CPDBench
-
-def main():
-  args = parse_args()
-
-  # data is the raw dataset dictionary, mat is a T x d matrix of observations
-  data, mat = load_dataset(args.input)
-
-  # set algorithm parameters that are not varied in the grid search
-  defaults = {
-    'param_1': value_1,
-    'param_2': value_2
-  }
-
-  # combine command line arguments with defaults
-  parameters = make_param_dict(args, defaults)
-
-  # start the timer
-  start_time = time.time()
-  error = None
-  status = 'fail' # if not overwritten, it must have failed
-
-  # run the algorithm in a try/except
-  try:
-      locations = your_custom_method(mat, parameters)
-      status = 'success'
-  except Exception as err:
-      error = repr(err)
-
-  stop_time = time.time()
-  runtime = stop_time - start_time
-
-  # exit with error if the run failed
-  if status == 'fail':
-    exit_with_error(data, args, parameters, error, __file__)
-
-  # make sure locations are 0-based and integer!
-
-  exit_success(data, args, parameters, locations, runtime, __file__)
-```
-
-Remember to add the following to the bottom of the script so it can be run 
-from the command line:
-
-```python
-if __name__ == '__main__':
-  main()
-```
-
 If you need to add a timeout to your method, take a look at the 
 [BOCPDMS](./execs/python/cpdbench_bocpdms.py) example.
 
@@ -302,55 +106,6 @@ specified by command line arguments, which are parsed using
 scripts we use a number of utility functions in the 
 [utils.R](./execs/R/utils.R) file. To reliably load this file you can use the 
 ``load.utils()`` function available in all R scripts.
-
-The main function of a method implemented in R could be roughly as follows:
-
-```R
-main <- function()
-{
-  args <- parse.args()
-
-  # load the data
-  data <- load.dataset(args$input)
-
-  # create list of default algorithm parameters
-  defaults <- list(param_1=value_1, param_2=value_2)
-
-  # combine defaults and command line arguments
-  params <- make.param.list(args, defaults)
-
-  # Start the timer
-  start.time <- Sys.time()
-
-  # call the detection function in a tryCatch
-  result <- tryCatch({
-    locs <- your.custom.method(data$mat, params)
-    list(locations=locs, error=NULL)
-  }, error=function(e) {
-    return(list(locations=NULL, error=e$message))
-  })
-
-  stop.time <- Sys.time()
-
-  # Compute runtime, note units='secs' is not optional!
-  runtime <- difftime(stop.time, start.time, units='secs')
-
-  if (!is.null(result$error))
-    exit.with.error(data$original, args, params, result$error)
-
-  # convert result$locations to 0-based if needed
-
-  exit.success(data$original, args, params, locations, runtime)
-}
-```
-
-Remember to add the following to the bottom of the script so it can be run 
-from the command line:
-
-```R
-load.utils()
-main()
-```
 
 #### Adding the method to the experimental configuration
 
@@ -468,11 +223,3 @@ The code in this repository is licensed under the MIT license, unless
 otherwise specified. See the [LICENSE file](LICENSE) for further details. 
 Reuse of the code in this repository is allowed, but should cite [our 
 paper](https://arxiv.org/abs/2003.06222).
-
-## Notes
-
-If you find any problems or have a suggestion for improvement of this 
-repository, please let us know as it will help us make this resource better 
-for everyone. You can open an issue on 
-[GitHub](https://github.com/alan-turing-institute/TCPDBench) or send an email 
-to ``gertjanvandenburg at gmail dot com``.

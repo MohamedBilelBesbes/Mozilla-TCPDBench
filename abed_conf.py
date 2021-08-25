@@ -66,48 +66,7 @@ DATADIR = "datasets"
 EXECDIR = "execs"
 
 DATASETS = [
-    "apple",
-    "bank",
-    "bee_waggle_6",
-    "bitcoin",
-    "brent_spot",
-    "businv",
-    "centralia",
-    "children_per_woman",
-    "co2_canada",
-    "construction",
-    "debt_ireland",
-    "gdp_argentina",
-    "gdp_croatia",
-    "gdp_iran",
-    "gdp_japan",
-    "global_co2",
-    "homeruns",
-    "iceland_tourism",
-    "jfk_passengers",
-    "lga_passengers",
-    "measles",
-    "nile",
-    "occupancy",
-    "ozone",
-    "quality_control_1",
-    "quality_control_2",
-    "quality_control_3",
-    "quality_control_4",
-    "quality_control_5",
-    "rail_lines",
-    "ratner_stock",
-    "robocalls",
-    "run_log",
-    "scanline_126007",
-    "scanline_42049",
-    "seatbelts",
-    "shanghai_license",
-    "uk_coal_employ",
-    "unemployment_nl",
-    "usd_isk",
-    "us_population",
-    "well_log",
+    # TODO: add your datasets!
 ]
 DATASET_NAMES = {k: k for k in DATASETS}
 
@@ -126,6 +85,7 @@ METHODS = [
     "best_wbs",
     "best_prophet",
     "best_zero",
+    "best_mongodb",
     "default_bocpd",
     "default_bocpdms",
     "default_rbocpdms",
@@ -140,6 +100,7 @@ METHODS = [
     "default_wbs",
     "default_prophet",
     "default_zero",
+    "default_mongodb",
 ]
 
 # many of these combinations will be invalid for the changepoint package, but
@@ -213,6 +174,10 @@ PARAMS = {
     },
     "best_prophet": {"Nmax": ["max", "default"]},
     "best_zero": {"no_param": [0]},
+    "best_mongodb": {
+        "pvalue": [0.01, 0.05],
+        "permutations": [10, 20, 50, 100, 150, 200],
+    },
     "default_bocpd": {"no_param": [0]},
     "default_bocpdms": {"no_param": [0]},
     "default_rbocpdms": {"no_param": [0]},
@@ -226,7 +191,8 @@ PARAMS = {
     "default_kcpa": {"no_param": [0]},
     "default_wbs": {"no_param": [0]},
     "default_prophet": {"no_param": [0]},
-    "default_zero": {"no_param": [0]}
+    "default_zero": {"no_param": [0]},
+    "default_mongodb": {"no_param": [0]}
 }
 
 COMMANDS = {
@@ -248,6 +214,7 @@ COMMANDS = {
         "source {execdir}/python/rbocpdms/venv/bin/activate && python {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --alpha-param {alpha_param} --alpha-rld {alpha_rld} --use-timeout"
     ),
     "best_zero": "python {execdir}/python/cpdbench_zero.py -i {datadir}/{dataset}.json",
+    "best_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json --pvalue {pvalue} --permutations {permutations}",
     "default_amoc": "Rscript --no-save --slave {execdir}/R/cpdbench_changepoint.R -i {datadir}/{dataset}.json -p MBIC -f mean -t Normal -m AMOC",
     "default_binseg": "Rscript --no-save --slave {execdir}/R/cpdbench_changepoint.R -i {datadir}/{dataset}.json -p MBIC -f mean -t Normal -m BinSeg -Q default",
     "default_cpnp": "Rscript --no-save --slave {execdir}/R/cpdbench_changepointnp.R -i {datadir}/{dataset}.json -p MBIC -q 10",
@@ -262,6 +229,7 @@ COMMANDS = {
     "default_bocpdms": "source {execdir}/python/bocpdms/venv/bin/activate && python {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 0",
     "default_rbocpdms": "source {execdir}/python/rbocpdms/venv/bin/activate && python {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 100 --alpha-param 0.5 --alpha-rld 0.5 --timeout 240",
     "default_zero": "python {execdir}/python/cpdbench_zero.py -i {datadir}/{dataset}.json",
+    "default_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json",
 }
 
 METRICS = {}
@@ -284,7 +252,7 @@ PBS_WALLTIME = 360  # Walltime in minutes
 PBS_CPUTYPE = None
 PBS_CORETYPE = None
 PBS_PPN = None
-PBS_MODULES = ["mpicopy", "python/2.7.9"]
+PBS_MODULES = ["mpicopy", "python/3.9.6"]
 PBS_EXPORTS = ["PATH=$PATH:/home/%s/.local/bin/abed" % REMOTE_USER]
 PBS_MPICOPY = ["datasets", "execs", TASK_FILE]
 PBS_TIME_REDUCE = 600  # Reduction of runtime in seconds
