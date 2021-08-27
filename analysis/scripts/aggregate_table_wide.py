@@ -31,17 +31,7 @@ class Method(Enum):
     segneigh = "segneigh"
     wbs = "wbs"
     zero = "zero"
-
-
-# Methods that support multidimensional datasets
-MULTIMETHODS = [
-    Method.bocpd,
-    Method.bocpdms,
-    Method.ecp,
-    Method.kcpa,
-    Method.rbocpdms,
-    Method.zero
-]
+    mongodb = "mongodb"
 
 
 def parse_args():
@@ -52,18 +42,8 @@ def parse_args():
         required=True,
     )
     parser.add_argument(
-        "--bcm",
-        help="Path to json file with results for: best/cover/multi",
-        required=True,
-    )
-    parser.add_argument(
         "--bfu",
         help="Path to json file with results for: best/f1/uni",
-        required=True,
-    )
-    parser.add_argument(
-        "--bfm",
-        help="Path to json file with results for: best/f1/multi",
         required=True,
     )
     parser.add_argument(
@@ -72,18 +52,8 @@ def parse_args():
         required=True,
     )
     parser.add_argument(
-        "--dcm",
-        help="Path to json file with results for: default/cover/multi",
-        required=True,
-    )
-    parser.add_argument(
         "--dfu",
         help="Path to json file with results for: default/f1/uni",
-        required=True,
-    )
-    parser.add_argument(
-        "--dfm",
-        help="Path to json file with results for: default/f1/multi",
         required=True,
     )
     return parser.parse_args()
@@ -100,10 +70,6 @@ def make_table(
     uni_default_f1,
     uni_best_cover,
     uni_best_f1,
-    multi_default_cover,
-    multi_default_f1,
-    multi_best_cover,
-    multi_best_f1,
     methods,
 ):
     """Create part of the aggregate table
@@ -165,33 +131,24 @@ def make_table(
     textsc = lambda m: "\\textsc{%s}%s" % (m, (L - len(m)) * " ")
     table.append(list(map(textsc, methods)))
 
-    all_exps = [
-        [uni_default_cover, uni_default_f1, uni_best_cover, uni_best_f1],
-        [
-            multi_default_cover,
-            multi_default_f1,
-            multi_best_cover,
-            multi_best_f1,
-        ],
-    ]
+    all_exps = [uni_default_cover, uni_default_f1, uni_best_cover, uni_best_f1]
 
-    for exps in all_exps:
-        for exp in exps:
-            row = []
-            maxscore = max((exp[m] for m in methods if m in exp))
-            for m in methods:
-                if not m in exp:
-                    row.append(5 * " ")
-                    continue
-                score = exp[m]
-                scorestr = tabulate._format(
-                    score, tabulate._float_type, ".3f", ""
-                )
-                if score == maxscore:
-                    row.append("\\textbf{%s}" % scorestr)
-                else:
-                    row.append(scorestr)
-            table.append(row)
+    for exp in all_exps:
+        row = []
+        maxscore = max((exp[m] for m in methods if m in exp))
+        for m in methods:
+            if not m in exp:
+                row.append(5 * " ")
+                continue
+            score = exp[m]
+            scorestr = tabulate._format(
+                score, tabulate._float_type, ".3f", ""
+            )
+            if score == maxscore:
+                row.append("\\textbf{%s}" % scorestr)
+            else:
+                row.append(scorestr)
+        table.append(row)
 
     transposed = list(zip(*table))
     for row in transposed:
@@ -206,16 +163,12 @@ def main():
     args = parse_args()
 
     bcu = load_json(args.bcu)
-    bcm = load_json(args.bcm)
     bfu = load_json(args.bfu)
-    bfm = load_json(args.bfm)
     dcu = load_json(args.dcu)
-    dcm = load_json(args.dcm)
     dfu = load_json(args.dfu)
-    dfm = load_json(args.dfm)
 
     methods = sorted([m.name for m in Method])
-    tex = make_table("Wide", dcu, dfu, bcu, bfu, dcm, dfm, bcm, bfm, methods)
+    tex = make_table("Wide", dcu, dfu, bcu, bfu, methods)
 
     print("\n".join(tex))
 

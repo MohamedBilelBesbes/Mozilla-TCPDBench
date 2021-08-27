@@ -1,19 +1,5 @@
 # Turing Change Point Detection Benchmark
-
-Change point detection focuses on accurately detecting moments of abrupt 
-change in the behavior of a time series. While many methods for change point 
-detection exist, past research has paid little attention to the evaluation of 
-existing algorithms on real-world data. This work introduces a benchmark study 
-and a dataset that are explicitly designed for the evaluation of change point detection algorithms. 
-We hope that our work becomes a proving ground for the comparison and 
-development of change point detection algorithms that work well in practice.
-
-This repository contains the code necessary to evaluate and analyze a 
-significant number of change point detection algorithms on the TCPD, and 
-serves to reproduce the work in [Van den Burg and Williams 
-(2020)](https://arxiv.org/abs/2003.06222). Note that work based on either the 
-dataset or this benchmark should cite that paper:
-
+Note that work based on either the dataset or this benchmark should cite that paper:
 ```bib
 @article{vandenburg2020evaluation,
         title={An Evaluation of Change Point Detection Algorithms},
@@ -23,70 +9,23 @@ dataset or this benchmark should cite that paper:
 }
 ```
 
-For the experiments we've used the [abed](https://github.com/GjjvdBurg/abed) 
-command line program, which makes it easy to organize and run the experiments. 
-This means that all experiments are defined through the 
-[abed_conf.py](abed_conf.py) file. In particular, the hyperparameters and the 
-command line arguments to all methods are defined in that file. Next, all 
-methods are called as command line scripts and they are defined in the 
-[execs](execs) directory. The raw results from the experiments are collected 
-in JSON files and placed in the [abed_results](abed_results) directory, 
-organized by dataset and method. Finally, we use 
-[Make](https://www.gnu.org/software/make/) to coordinate our analysis scripts: 
-first we generate [summary files](analysis/output/summaries) using 
-[summarize.py](analysis/scripts/summarize.py), and then use these to generate 
-all the tables and figures in the paper.
-
-## Getting Started
-
-This repository contains all the code to generate the results 
-(tables/figures/constants) from the paper, as well as to reproduce the 
-experiments entirely. You can either install the dependencies directly on your 
-machine or use the provided Dockerfile (see below). If you don't use Docker, 
-first clone this repository using:
-
-```
-$ git clone --recurse-submodules https://github.com/simontrapp/TCPDBench
-```
-
-### Running the experiments with Docker
-
-If you like to use [Docker](https://www.docker.com/) to manage the environment 
-and dependencies, you can do so easily with the provided Dockerfile. You can 
-build the Docker image using:
-
-```
-# TODO: add the datasets/*.json and analysis/annotations/annotations.json, edit the DATASETS in abed_conf.py and modifiy dataset enum in analysis/scripts/make_table.py
-$ docker build -t tcpdbench .
+## Running the experiments with Docker
+1. Download the Dockerfile from this repository into a directory
+2. Inside this directory, create a folder `datasets`, where your data is stored
+3. create files `annotations.json`, `abed_conf.py` and `make_table.py` and configure them according to your datasets
+4. Run the commands below to execute the experiments
+```shell
+docker build -t tcpdbench .
 # make results persist to host
-$ mkdir docker_results
-$ docker volume create --driver local --opt type=none --opt device=./docker_results --opt o=bind tcpdbench_vol
-# OPTION 1: reproduce figures
-$ docker run -i -t -v tcpdbench_vol:/TCPDBench tcpdbench /bin/bash -c "make results"
-# OPTION 2: reproduce all experiments (-np sets number of threads)
-$ docker run -i -t -v tcpdbench_vol:/TCPDBench tcpdbench /bin/bash -c "mv abed_results old_abed_results && mkdir abed_results && abed reload_tasks && abed status && make venvs && mpiexec --allow-run-as-root -np 4 abed local && make results"
+mkdir docker_results
+docker volume create --driver local --opt type=none --opt device=./docker_results --opt o=bind tcpdbench_vol
+# reproduce all experiments (-np sets number of threads)
+docker run -i -t -v tcpdbench_vol:/TCPDBench/docker_results tcpdbench /bin/bash -c "mv abed_results old_abed_results && mkdir abed_results && abed reload_tasks && abed status && make venvs && mpiexec --allow-run-as-root -np 4 abed local && make results && cp -r /TCPDBench/abed_results /TCPDBench/docker_results && && cp -r /TCPDBench/analysis/output /TCPDBench/docker_results"
 ```
 
 ## Extending the Benchmark
-
 ### Adding a new method
-
-To add a new method to the benchmark, you'll need to write a script in the 
-``execs`` folder that takes a dataset file as input and computes the change 
-point locations.  Currently the methods are organized by language (R and 
-python), but you don't necessarily need to follow this structure when adding a 
-new method. Please do check the existing code for inspiration though, as 
-adding a new method is probably easiest when following the same structure.
-
-Experiments are managed using the [abed](https://github.com/GjjvdBurg/abed) 
-command line application. This facilitates running all the methods with all 
-their hyperparameter settings on all datasets.
-
-Note that currently the methods print the output file to stdout, so if you 
-want to print from your script, use stderr.
-
 #### Python
-
 When adding a method in Python, you can start with the 
 [cpdbench_zero.py](./execs/python/cpdbench_zero.py) file as a template, as 
 this contains most of the boilerplate code. A script should take command line 
@@ -94,11 +33,7 @@ arguments where ``-i/--input`` marks the path to a dataset file and optionally
 can take further command line arguments for hyperparameter settings. 
 Specifying these items from the command line facilitates reproducibility.
 
-If you need to add a timeout to your method, take a look at the 
-[BOCPDMS](./execs/python/cpdbench_bocpdms.py) example.
-
 #### R
-
 Adding a method implemented in R to the benchmark can be done similarly to how 
 it is done for Python. Again, the input file path and the hyperparameters are 
 specified by command line arguments, which are parsed using 
@@ -108,7 +43,6 @@ scripts we use a number of utility functions in the
 ``load.utils()`` function available in all R scripts.
 
 #### Adding the method to the experimental configuration
-
 When you've written the command line script to run your method and verified 
 that it works correctly, it's time to add it to the experiment configuration. 
 For this, we'll have to edit the [abed_conf.py](./abed_conf.py) file.
@@ -131,9 +65,7 @@ For this, we'll have to edit the [abed_conf.py](./abed_conf.py) file.
    the other settings. Use curly braces to specify hyperparameters, matching 
    the names of the fields in the ``PARAMS`` dictionary.
 
-
 #### Dependencies
-
 If your method needs external R or Python packages to operate, you can add 
 them to the respective dependency lists.
 
@@ -150,36 +82,7 @@ them to the respective dependency lists.
   bocpdms and rbocpdms, copy and edit the corresponding lines in the Makefile, 
   and run ``make venv_<yourmethod>`` to build the virtual environment.
 
-
-#### Running experiments
-
-When you've added the method and set up the environment, run
-
-```
-$ abed reload_tasks
-```
-
-to have abed generate the new tasks for your method (see above under [Getting 
-Started](#getting-started)). Note that abed automatically does a Git commit 
-when you do this, so you may want to switch to a separate branch. You can see 
-the tasks that abed has generated (and thus the command that will be executed) 
-using the command:
-
-```
-$ abed explain_tbd_tasks
-```
-
-If you're satisfied with the commands, you can run the experiments using:
-
-```
-$ mpiexec -np 4 abed local
-```
-
-You can subsequently use the Makefile to generate updated figures and tables 
-with your method or dataset.
-
 ### Adding a new dataset
-
 To add a new dataset to the benchmark you'll need both a dataset file (in JSON 
 format) and annotations (for evaluation). More information on how the datasets 
 are constructed can be found in the 
@@ -206,19 +109,10 @@ includes a schema file. A high-level overview is as follows:
   [uk_coal_employ](https://github.com/alan-turing-institute/TCPD/blob/master/datasets/uk_coal_employ/uk_coal_employ.json#L236) 
   for an example).
 
-If you want to evaluate the methods in the benchmark on a new dataset, you may 
-want to collect annotations for the dataset. These annotations can be 
-collected in the [annotations.json](./analysis/annotations/annotations.json) 
-file, which is an object that maps each dataset name to a map from the 
-annotator ID to the marked change points. You can collect annotations using 
-the [annotation tool](https://github.com/alan-turing-institute/annotatechange) 
-created for this project.
-
 Finally, add your method to the ``DATASETS`` field in the ``abed_conf.py`` 
 file. Proceed with running the experiments as described above.
 
 ## License
-
 The code in this repository is licensed under the MIT license, unless 
 otherwise specified. See the [LICENSE file](LICENSE) for further details. 
 Reuse of the code in this repository is allowed, but should cite [our 

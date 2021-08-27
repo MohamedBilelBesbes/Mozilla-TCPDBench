@@ -52,7 +52,7 @@ summary-dir:
 summaries: $(DATASET_SUMMARIES)
 
 $(DATASET_SUMMARIES): $(SUMMARY_DIR)/summary_%.json: $(DATA_DIR)/%.json $(SCRIPT_DIR)/summarize.py | summary-dir
-	python $(SCRIPT_DIR)/summarize.py -a $(ANNOTATION_FILE) -d $< -r $(RESULT_DIR) -o $@
+	python3.9 $(SCRIPT_DIR)/summarize.py -a $(ANNOTATION_FILE) -d $< -r $(RESULT_DIR) -o $@
 
 clean_summaries:
 	rm -f $(DATASET_SUMMARIES)
@@ -79,22 +79,22 @@ best_tables: \
 	$(TABLE_DIR)/best_cover_uni_full.json
 
 $(TABLE_DIR)/best_f1_combined_full.tex: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e best -m f1 -d combined -f tex -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e best -m f1 -d combined -f tex -t full > $@
 
 $(TABLE_DIR)/best_cover_combined_full.tex: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e best -m cover -d combined -f tex -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e best -m cover -d combined -f tex -t full > $@
 
 $(TABLE_DIR)/best_f1_uni_avg.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e best -m f1 -d uni -f json -t avg > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e best -m f1 -d uni -f json -t avg > $@
 
 $(TABLE_DIR)/best_cover_uni_avg.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e best -m cover -d uni -f json -t avg > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e best -m cover -d uni -f json -t avg > $@
 
 $(TABLE_DIR)/best_cover_uni_full.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e best -m cover -d uni -f json -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e best -m cover -d uni -f json -t full > $@
 
 $(TABLE_DIR)/best_f1_uni_full.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e best -m f1 -d uni -f json -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e best -m f1 -d uni -f json -t full > $@
 
 default_tables: \
 	$(TABLE_DIR)/default_f1_combined_full.tex \
@@ -105,22 +105,22 @@ default_tables: \
 	$(TABLE_DIR)/default_f1_uni_full.json
 
 $(TABLE_DIR)/default_f1_combined_full.tex: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e default -m f1 -d combined -f tex -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e default -m f1 -d combined -f tex -t full > $@
 
 $(TABLE_DIR)/default_cover_combined_full.tex: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e default -m cover -d combined -f tex -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e default -m cover -d combined -f tex -t full > $@
 
 $(TABLE_DIR)/default_f1_uni_avg.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e default -m f1 -d uni -f json -t avg > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e default -m f1 -d uni -f json -t avg > $@
 
 $(TABLE_DIR)/default_cover_uni_avg.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e default -m cover -d uni -f json -t avg > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e default -m cover -d uni -f json -t avg > $@
 
 $(TABLE_DIR)/default_cover_uni_full.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e default -m cover -d uni -f json -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e default -m cover -d uni -f json -t full > $@
 
 $(TABLE_DIR)/default_f1_uni_full.json: $(SCRIPT_DIR)/make_table.py summaries | table-dir
-	python $< -s $(SUMMARY_DIR) -e default -m f1 -d uni -f json -t full > $@
+	python3.9 $< -s $(SUMMARY_DIR) -e default -m f1 -d uni -f json -t full > $@
 
 aggregate_wide: $(TABLE_DIR)/aggregate_table_wide.tex
 
@@ -131,7 +131,7 @@ $(TABLE_DIR)/aggregate_table_wide.tex: $(SCRIPT_DIR)/aggregate_table_wide.py \
 	$(TABLE_DIR)/default_cover_uni_avg.json \
 	$(TABLE_DIR)/default_f1_uni_avg.json \
 	$(TABLE_DIR)/default_f1_uni_avg.json | table-dir
-	python $< \
+	python3.9 $< \
 		--bcu $(TABLE_DIR)/best_cover_uni_avg.json \
 		--bfu $(TABLE_DIR)/best_f1_uni_avg.json \
 		--dcu $(TABLE_DIR)/default_cover_uni_avg.json \
@@ -177,19 +177,19 @@ rankplots: \
 
 $(RANK_DIR)/rankplot_best_cover_uni.tex: $(TABLE_DIR)/best_cover_uni_full.json \
 	$(SCRIPT_DIR)/rank_plots.py | rank-dir
-	python $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type best
+	python3.9 $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type best
 
 $(RANK_DIR)/rankplot_best_f1_uni.tex: $(TABLE_DIR)/best_f1_uni_full.json \
 	$(SCRIPT_DIR)/rank_plots.py | rank-dir
-	python $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type best
+	python3.9 $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type best
 
 $(RANK_DIR)/rankplot_default_cover_uni.tex: $(TABLE_DIR)/default_cover_uni_full.json \
 	$(SCRIPT_DIR)/rank_plots.py | rank-dir
-	python $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type default
+	python3.9 $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type default
 
 $(RANK_DIR)/rankplot_default_f1_uni.tex: $(TABLE_DIR)/default_f1_uni_full.json \
 	$(SCRIPT_DIR)/rank_plots.py | rank-dir
-	python $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type default
+	python3.9 $(SCRIPT_DIR)/rank_plots.py -i $< -o $@ -b max --type default
 
 $(RANK_DIR)/rankplot_%.pdf: $(RANK_DIR)/rankplot_%.tex | rank-dir
 	latexmk -pdf -pdflatex="pdflatex -interaction=nonstopmode --shell-escape" \
@@ -230,47 +230,47 @@ constants: $(CONSTANT_TARGETS)
 
 $(CONST_DIR)/sigtest_global_best_cover_uni.tex: $(TABLE_DIR)/best_cover_uni_full.json \
 	$(SCRIPT_DIR)/significance.py | const-dir
-	python $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
+	python3.9 $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
 
 $(CONST_DIR)/sigtest_global_best_f1_uni.tex: $(TABLE_DIR)/best_f1_uni_full.json \
 	$(SCRIPT_DIR)/significance.py | const-dir
-	python $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
+	python3.9 $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
 
 $(CONST_DIR)/sigtest_global_default_cover_uni.tex: $(TABLE_DIR)/default_cover_uni_full.json \
 	$(SCRIPT_DIR)/significance.py | const-dir
-	python $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
+	python3.9 $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
 
 $(CONST_DIR)/sigtest_global_default_f1_uni.tex: $(TABLE_DIR)/default_f1_uni_full.json \
 	$(SCRIPT_DIR)/significance.py | const-dir
-	python $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
+	python3.9 $(SCRIPT_DIR)/significance.py -i $< -o $@ --type best --mode global
 
 $(CONST_DIR)/SeriesLengthMin.tex: $(SCRIPT_DIR)/descriptive_length.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t min > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t min > $@
 
 $(CONST_DIR)/SeriesLengthMax.tex: $(SCRIPT_DIR)/descriptive_length.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t max > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t max > $@
 
 $(CONST_DIR)/SeriesLengthMean.tex: $(SCRIPT_DIR)/descriptive_length.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t mean > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t mean > $@
 
 $(CONST_DIR)/UniqueAnnotationsMin.tex: $(SCRIPT_DIR)/descriptive_annotations.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t min > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t min > $@
 
 $(CONST_DIR)/UniqueAnnotationsMax.tex: $(SCRIPT_DIR)/descriptive_annotations.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t max > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t max > $@
 
 $(CONST_DIR)/UniqueAnnotationsMean.tex: $(SCRIPT_DIR)/descriptive_annotations.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t mean > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t mean > $@
 
 $(CONST_DIR)/UniqueAnnotationsStd.tex: $(SCRIPT_DIR)/descriptive_annotations.py \
 	$(DATASET_SUMMARIES) | const-dir
-	python $< -s $(SUMMARY_DIR) -t std > $@
+	python3.9 $< -s $(SUMMARY_DIR) -t std > $@
 
 clean_constants:
 	rm -f $(CONSTANT_TARGETS)
@@ -322,7 +322,7 @@ clean_venvs: clean_R_venv
 .PHONY: validate
 
 validate: ./utils/validate_schema.py ./schema.json
-	python $< -s ./schema.json -r $(RESULT_DIR)
+	python3.9 $< -s ./schema.json -r $(RESULT_DIR)
 
 ###########
 #         #

@@ -4,6 +4,8 @@ RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && \
 	apt-get remove -y python && \
 	apt-get install -y --no-install-recommends \
+        wget \
+        software-properties-common \
 		git \
 		build-essential \
 		r-base \
@@ -21,29 +23,29 @@ RUN apt-get update && \
 		libfreetype6-dev \
 		libv8-dev
 
-# TODO: install python 3.9 and make sure python means python3.9!
-RUN apt-get install -y --no-install-recommends \
-	python3 \
-	python3-dev \
-	python3-tk \
-	python3-venv \
-	python3-pip && \
-    pip3 install --no-cache-dir --upgrade setuptools && \
-	echo "alias python='python3'" >> /root/.bash_aliases && \
-	echo "alias pip='pip3'" >> /root/.bash_aliases && \
-	cd /usr/local/bin && ln -s /usr/bin/python3 python && \
-	cd /usr/local/bin && ln -s /usr/bin/pip3 pip && \
-    pip install virtualenv abed wheel
+RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y --no-install-recommends \
+	python3.9 \
+	python3.9-dev \
+	python3.9-tk \
+	python3.9-distutils \
+    python3.9-venv && \
+    python3.9 -m pip install --no-cache-dir --upgrade setuptools && \
+    python3.9 -m pip install virtualenv abed wheel jsonschema
 
 # Clone the repo
 RUN git clone --recurse-submodules https://github.com/simontrapp/TCPDBench
 
-# TODO: COPY the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
-# TODO: create analysis/output/summaries/
-RUN mkdir -p /TCPDBench/datasets && cp TCPD/export/*.json /TCPDBench/datasets/
+# copy the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
+ADD datasets /TCPDBench/datasets
+COPY annotations.json /TCPDBench/analysis/annotations/
+COPY make_table.py /TCPDBench/analysis/make_table.py
+COPY abed_conf.py /TCPDBench/
+
+# create analysis/output/summaries/
+RUN mkdir -p /TCPDBench/analysis/output/summaries && mkdir -p /TCPDBench/abed_results
 
 # Install Python dependencies
-RUN pip install -r /TCPDBench/analysis/requirements.txt
+RUN python3.9 -m pip install -r /TCPDBench/analysis/requirements.txt
 
 # Set the working directory
 WORKDIR TCPDBench

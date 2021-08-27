@@ -17,8 +17,6 @@ import json
 import os
 import statistics
 
-N_DATASETS = 42
-
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -40,7 +38,6 @@ def parse_args():
 
 def load_unique_annotations(summary_dir):
     files = os.listdir(summary_dir)
-    assert len(files) == N_DATASETS
 
     n_uniq_anno = []
     for f in sorted(files):
