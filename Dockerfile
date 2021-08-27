@@ -38,7 +38,7 @@ RUN git clone --recurse-submodules https://github.com/simontrapp/TCPDBench
 # copy the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
 ADD datasets /TCPDBench/datasets
 COPY annotations.json /TCPDBench/analysis/annotations/
-COPY make_table.py /TCPDBench/analysis/make_table.py
+COPY make_table.py /TCPDBench/analysis/
 COPY abed_conf.py /TCPDBench/
 
 # create analysis/output/summaries/
