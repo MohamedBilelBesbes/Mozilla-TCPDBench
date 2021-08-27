@@ -20,7 +20,7 @@ docker build -t tcpdbench .
 mkdir docker_results
 docker volume create --driver local --opt type=none --opt device=./docker_results --opt o=bind tcpdbench_vol
 # reproduce all experiments (-np sets number of threads)
-docker run -i -t -v tcpdbench_vol:/TCPDBench/docker_results tcpdbench /bin/bash -c "mv abed_results old_abed_results && mkdir abed_results && abed reload_tasks && abed status && make venvs && mpiexec --allow-run-as-root -np 4 abed local && make results && cp -r /TCPDBench/abed_results /TCPDBench/docker_results && && cp -r /TCPDBench/analysis/output /TCPDBench/docker_results"
+docker run -i -t -v tcpdbench_vol:/TCPDBench/docker_results tcpdbench /bin/bash -c "abed reload_tasks && abed status && make venvs && mpiexec --allow-run-as-root -np 4 abed local && make results && cp -r /TCPDBench/abed_results /TCPDBench/docker_results && cp -r /TCPDBench/analysis/output /TCPDBench/docker_results"
 ```
 
 ## Extending the Benchmark
