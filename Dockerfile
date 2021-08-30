@@ -34,7 +34,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -
     python3.9 -m pip install virtualenv abed wheel jsonschema
 
 # Clone the repo
-RUN git clone --recurse-submodules https://github.com/simontrapp/TCPDBench
+RUN git clone https://github.com/simontrapp/TCPDBench
 
 # copy the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
 ADD datasets /TCPDBench/datasets
