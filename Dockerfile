@@ -28,7 +28,8 @@ RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -
 	python3.9-dev \
 	python3.9-tk \
 	python3.9-distutils \
-    python3.9-venv && \
+    python3.9-venv \
+    python3-pip && \
     python3.9 -m pip install --no-cache-dir --upgrade setuptools && \
     python3.9 -m pip install virtualenv abed wheel jsonschema
 
