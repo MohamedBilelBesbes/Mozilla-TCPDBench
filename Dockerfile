@@ -42,12 +42,3 @@ RUN git clone https://github.com/simontrapp/TCPDBench && cd /TCPDBench && make v
 RUN mkdir -p /TCPDBench/analysis/output/summaries && mkdir -p /TCPDBench/abed_results
 # Install Python dependencies
 RUN python3.9 -m pip install -r /TCPDBench/analysis/requirements.txt
-
-# copy the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
-ADD datasets /TCPDBench/datasets
-COPY annotations.json /TCPDBench/analysis/annotations/
-COPY make_table.py /TCPDBench/analysis/scripts/
-COPY abed_conf.py /TCPDBench/
-
-# Set the working directory
-WORKDIR TCPDBench
