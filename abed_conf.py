@@ -210,13 +210,13 @@ COMMANDS = {
     "best_wbs": "Rscript --no-save --slave {execdir}/R/cpdbench_wbs.R -i {datadir}/{dataset}.json -K {Kmax} --penalty {penalty} -g {integrated}",
     "best_bocpd": "Rscript --no-save --slave {execdir}/R/cpdbench_ocp.R -i {datadir}/{dataset}.json -l {intensity} --prior-a {prior_a} --prior-b {prior_b} --prior-k {prior_k}",
     "best_bocpdms": (
-        "source {execdir}/python/bocpdms/venv/bin/activate && python3.9 {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --use-timeout"
+        "source {execdir}/python/bocpdms/venv/bin/activate && python {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --use-timeout"
     ),
     "best_rbocpdms": (
-        "source {execdir}/python/rbocpdms/venv/bin/activate && python3.9 {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --alpha-param {alpha_param} --alpha-rld {alpha_rld} --use-timeout"
+        "source {execdir}/python/rbocpdms/venv/bin/activate && python {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --alpha-param {alpha_param} --alpha-rld {alpha_rld} --use-timeout"
     ),
     "best_zero": "python3.9 {execdir}/python/cpdbench_zero.py -i {datadir}/{dataset}.json",
-    "best_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python3.9 {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json --pvalue {pvalue} --permutations {permutations}",
+    "best_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json --pvalue {pvalue} --permutations {permutations}",
     "default_amoc": "Rscript --no-save --slave {execdir}/R/cpdbench_changepoint.R -i {datadir}/{dataset}.json -p MBIC -f mean -t Normal -m AMOC",
     "default_binseg": "Rscript --no-save --slave {execdir}/R/cpdbench_changepoint.R -i {datadir}/{dataset}.json -p MBIC -f mean -t Normal -m BinSeg -Q default",
     "default_cpnp": "Rscript --no-save --slave {execdir}/R/cpdbench_changepointnp.R -i {datadir}/{dataset}.json -p MBIC -q 10",
@@ -228,10 +228,10 @@ COMMANDS = {
     "default_ecp": "Rscript --no-save --slave {execdir}/R/cpdbench_ecp.R -i {datadir}/{dataset}.json -a e.divisive --alpha 1.0 --minsize 30 --runs 199 --siglvl 0.05",
     "default_kcpa": "Rscript --no-save --slave {execdir}/R/cpdbench_ecp.R -i {datadir}/{dataset}.json -a kcpa -C 1.0 -L max",
     "default_bocpd": "Rscript --no-save --slave {execdir}/R/cpdbench_ocp.R -i {datadir}/{dataset}.json -l 100 --prior-a 1.0 --prior-b 1.0 --prior-k 1.0",
-    "default_bocpdms": "source {execdir}/python/bocpdms/venv/bin/activate && python3.9 {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 0",
-    "default_rbocpdms": "source {execdir}/python/rbocpdms/venv/bin/activate && python3.9 {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 100 --alpha-param 0.5 --alpha-rld 0.5 --timeout 240",
+    "default_bocpdms": "source {execdir}/python/bocpdms/venv/bin/activate && python {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 0",
+    "default_rbocpdms": "source {execdir}/python/rbocpdms/venv/bin/activate && python {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 100 --alpha-param 0.5 --alpha-rld 0.5 --timeout 240",
     "default_zero": "python3.9 {execdir}/python/cpdbench_zero.py -i {datadir}/{dataset}.json",
-    "default_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python3.9 {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json",
+    "default_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json",
 }
 
 METRICS = {}

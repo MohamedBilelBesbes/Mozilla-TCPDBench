@@ -31,22 +31,23 @@ RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -
     python3.9-venv \
     python3-pip && \
     python3.9 -m pip install --no-cache-dir --upgrade setuptools && \
-    python3.9 -m pip install virtualenv abed wheel jsonschema
+    python3.9 -m pip install virtualenv abed wheel jsonschema \
 
-# Clone the repo
-RUN git clone https://github.com/simontrapp/TCPDBench
+# Set the default shell to bash, needed to run abed_conf.py source commands
+RUN mv /bin/sh /bin/sh.old && cp /bin/bash /bin/sh
+
+# Clone the repo and init venvs
+RUN git clone https://github.com/simontrapp/TCPDBench && cd /TCPDBench && make venvs
+# create empty directories for results
+RUN mkdir -p /TCPDBench/analysis/output/summaries && mkdir -p /TCPDBench/abed_results
+# Install Python dependencies
+RUN python3.9 -m pip install -r /TCPDBench/analysis/requirements.txt
 
 # copy the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
 ADD datasets /TCPDBench/datasets
 COPY annotations.json /TCPDBench/analysis/annotations/
 COPY make_table.py /TCPDBench/analysis/scripts/
 COPY abed_conf.py /TCPDBench/
-
-# create analysis/output/summaries/
-RUN mkdir -p /TCPDBench/analysis/output/summaries && mkdir -p /TCPDBench/abed_results
-
-# Install Python dependencies
-RUN python3.9 -m pip install -r /TCPDBench/analysis/requirements.txt
 
 # Set the working directory
 WORKDIR TCPDBench

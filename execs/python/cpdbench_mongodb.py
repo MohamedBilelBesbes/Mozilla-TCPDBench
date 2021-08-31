@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-A method that always returns no change points
 
 Author: Simon Trapp
 Date: 2021-08-25
