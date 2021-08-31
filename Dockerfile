@@ -31,7 +31,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -
     python3.9-venv \
     python3-pip && \
     python3.9 -m pip install --no-cache-dir --upgrade setuptools && \
-    python3.9 -m pip install virtualenv abed wheel jsonschema \
+    python3.9 -m pip install virtualenv abed wheel jsonschema
 
 # Set the default shell to bash, needed to run abed_conf.py source commands
 RUN mv /bin/sh /bin/sh.old && cp /bin/bash /bin/sh
