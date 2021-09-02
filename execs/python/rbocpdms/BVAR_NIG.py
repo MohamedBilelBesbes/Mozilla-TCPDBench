@@ -2046,7 +2046,7 @@ class BVARNIG(ProbabilityModel):
         self.log_det_2_rt = self.log_det_2_rt[kept_run_lengths]
         self.retained_run_lengths = (
                     self.retained_run_lengths[kept_run_lengths])
-        self.model_log_evidence = scipy.misc.logsumexp(
+        self.model_log_evidence = scipy.special.logsumexp(
                         self.joint_log_probabilities )
         
     
@@ -2529,82 +2529,7 @@ class BVARNIG(ProbabilityModel):
                                0.000005 * np.ones((run_length_num+1))]
                     ), axis=0)
                 ) + all_predictives)
- 
-                
-        """STEP 5: If you use a generalized Bayesian loss function, adapt the
-        derivatives you return. In particular, you will want the derivative of
-        exp{loss(P(y_t|y_1:t-1, r_t))} for general losses. In the KL-case,
-        loss(.) = log(.) and nothing more needs to be done. In other cases, we
-        need to take some more steps"""
-        #DEBUG: Don't do this!
-        
-#        """STEP 5A: Power divergence, i.e. we use the loss function 
-#            loss(P(y_t|y_1:t-1, r_t)) = 
-#                P(y_t|y_1:t-1, r_t)^alpha + (1/(alpha+1)) * 
-#                integral(P(y_t|y_1:t-1, r_t)^(alpha + 1)dy_t,
-#        
-#        The derivative of which is 
-#            d/dtheta(loss(P(y_t|y_1:t-1, r_t)) = 
-#                alpha * [d/dtheta P(y_t|y_1:t-1, r_t)]^(alpha-1) +
-#                alpha/(alpha+1) *  integral * |b*/a* * C_t_inv|^-1  * 
-#                    d/dtheta |b*/a* * C_t_inv|, 
-#                    
-#        which we store in log-form."""
-#        if self.generalized_bayes == "power_divergence":
-#            #DEBUG: predictive_variance_log_det needs adjustment for a* and b*!
-#            #       they are stored inside there, so we need to subtract them
-#            #       again! i.e. multiply by a*/b*!
-#            
-#            """STEP 5A.1: Get all the parts that we need to sum over as logs"""
-#            integrals = self.get_log_integrals_power_divergence()
-#            modified_log_gradient_a_1 = (np.log(self.alpha) + 
-#                                       (self.alpha - 1) * log_gradients_a_val)
-#            modified_log_gradient_b_1 = (np.log(self.alpha) + 
-#                                       (self.alpha - 1) * log_gradients_b_val)            
-#            """Note: Sign of log_det_der_a is always negative! I.e., here we 
-#            store the log(X*) of X s.t. X = -exp(log(X*)), where X = det_der_a
-#            and log(X*) = log_det_der_a"""
-#            log_det_der_a = (np.log(self.S1) + np.log(self.S2) 
-#                - np.log(a_vec) + (self.predictive_variance_log_det))
-#            log_det_der_b = (np.log(self.S1) + np.log(self.S2) 
-#                - np.log(b_vec) + (self.predictive_variance_log_det))
-#            """Note: sign of modified_log_gradient_a_2 is negative, as 
-#            log_det_der_a has negative sign in exponential form, but integrals, 
-#            alpha, and determinant will have positive values"""
-#            modified_log_gradient_a_2 = (integrals + np.log(self.alpha) - 
-#                                         np.log(self.alpha + 1) -
-#                                         self.predictive_variance_log_det  +
-#                                         log_det_der_a)
-#            modified_log_gradient_b_2 = (integrals + np.log(self.alpha) - 
-#                                         np.log(self.alpha + 1) - 
-#                                         self.predictive_variance_log_det  +
-#                                         log_det_der_b)
-#            
-#            """STEP 5A.2: Sum over the log-parts using logsumexp to retrieve
-#            the final gradients. Notice that we have the signs of the 
-#            modified_log_gradient_a_1 (b_1) from before, since the only part
-#            modifying the sign from positive is the gradient of 
-#            P(y_t|y_1:t-1,r_t). Similarly, modified_log_gradient_a_2 (b_2) will
-#            be completely deterimined in its sign by log_det_der_a (_b), which
-#            is always positive for b and always negative for a."""
-#            log_gradients_a_val, log_gradients_a_sign = (
-#                scipy.misc.logsumexp(
-#                    a = np.array([modified_log_gradient_a_1, 
-#                                  modified_log_gradient_a_2]),
-#                    b = np.array([log_gradients_a_sign, 
-#                        -np.ones(np.size(modified_log_gradient_a_2))]), 
-#                    axis = 0,
-#                    return_sign = True
-#                ))
-#            log_gradients_b_val, log_gradients_b_sign = (
-#                scipy.misc.logsumexp(
-#                    a = np.array([modified_log_gradient_b_1, 
-#                                  modified_log_gradient_b_2]),
-#                    b = np.array([log_gradients_b_sign, 
-#                        np.ones(np.size(modified_log_gradient_b_2))]), 
-#                    axis = 0,
-#                    return_sign = True
-#                ))
+
                     
         """STEP 5: Package the results for each hyperparameter derivative,
         put it into one object, and return it"""
@@ -2799,7 +2724,7 @@ class BVARNIG(ProbabilityModel):
         """Note: expr_2_B is subtracted from expr_2_A, so reverse the sign"""
         expr_2_B_sign = -expr_2_B_sign
         
-        f_2_der_log, f_2_der_sign = scipy.misc.logsumexp(
+        f_2_der_log, f_2_der_sign = scipy.special.logsumexp(
                 a = np.array([
                         expr_2_A, expr_2_B
                         ]),
@@ -2829,7 +2754,7 @@ class BVARNIG(ProbabilityModel):
         f_2_full_expr = f_2_der_log + f_1_log + f_3_log
         f_3_full_expr = f_3_der_log + f_1_log + f_2_log
         log_integral_derivatives_val, log_integral_derivatives_sign = (
-            scipy.misc.logsumexp(
+            scipy.special.logsumexp(
                 a = np.array([
                         f_1_full_expr,
                         f_2_full_expr,
@@ -2875,7 +2800,7 @@ class BVARNIG(ProbabilityModel):
         expr_1_B = (-np.log(self.alpha_rld) + 
                     np.log(sign_1_B * predictive_log_probs) + 
                     self.alpha_rld * predictive_log_probs)
-        expr_1_val, expr_1_sign = scipy.misc.logsumexp(
+        expr_1_val, expr_1_sign = scipy.special.logsumexp(
                 a = np.array([
                         expr_1_A,
                         expr_1_B
@@ -2897,7 +2822,7 @@ class BVARNIG(ProbabilityModel):
         sign_2_A = np.ones(run_length_num)
         sign_2_B = (-1)*log_integral_derivatives_sign
         expr_2_B = -np.log(self.alpha_rld +1) + log_integral_derivatives_val
-        expr_2_val, expr_2_sign = scipy.misc.logsumexp(
+        expr_2_val, expr_2_sign = scipy.special.logsumexp(
                 a = np.array([
                         expr_2_A,
                         expr_2_B
@@ -2913,7 +2838,7 @@ class BVARNIG(ProbabilityModel):
         """STEP 3.4: add together expr_1_val and expr_2_val, yields log of
             {[-[1/alpha^2] * f(y)^alpha  + [1/alpha]*log(f(y)) * f(y)^alpha] + 
             [[1/(alpha+1)^2] * Int(alpha) - [1/(alpha+1)] * Int_der(alpha)]}"""
-        expr_val, expr_sign = scipy.misc.logsumexp(
+        expr_val, expr_sign = scipy.special.logsumexp(
                 a = np.array([
                         expr_1_val,
                         expr_2_val
@@ -2951,7 +2876,7 @@ class BVARNIG(ProbabilityModel):
         do better here!"""
         
         """STEP 1: Get the new gradient value"""
-        sign, gradient = scipy.misc.logsumexp(
+        sign, gradient = scipy.special.logsumexp(
                 a=(self.model_specific_joint_log_probabilities_derivative),
                 b=self.model_specific_joint_log_probabilities_derivative_sign,
                 return_sign=True, axis=1)
@@ -3037,7 +2962,7 @@ class BVARNIG(ProbabilityModel):
         """STEP 2.4: Multiply the MVSt densities with the run_length distro,
         which is equivalent to adding them on a log scale. Afterwards, use 
         logsumexp to get the sum over all of them (again on a log scale)"""
-        evaluation_objective = scipy.misc.logsumexp(
+        evaluation_objective = scipy.special.logsumexp(
                 MVSt_log_densities + run_length_distro)
         
         """STEP 3: Return the objective value"""

@@ -1,18 +1,3 @@
-# Python 3.5.2 |Anaconda 4.2.0 (64-bit)|
-# -*- coding: utf-8 -*-
-"""
-Last edited: 2017-09-13
-Author: Jeremias Knoblauch (J.Knoblauch@warwick.ac.uk)
-Forked by: Luke Shirley (L.Shirley@warwick.ac.uk)
-
-Description: Implements class CpModel, the Changepoint model used by the 
-Bayesian Online CP detection. The objects of this class store the prior 
-information on the number of CPs as well as the prior distribution on the 
-location of the CPs. 
-Traditionally, both are contained in a single prior run-length 
-distribution that implicitly specifies them, see Adams & MacKay (2007)
-"""
-
 from scipy import stats
 
 

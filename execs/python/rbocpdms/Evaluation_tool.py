@@ -18,7 +18,7 @@ import matplotlib.dates as mdates
 from matplotlib.dates import drange
 from matplotlib.colors import LogNorm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from scipy import misc
+from scipy import special
 import numpy as np
 import pickle
 import os
@@ -1214,7 +1214,7 @@ class EvaluationTool:
         for (t,i) in zip(range(start + offset, stop), range(0, np.size(time_range))): #m_rl_distr[time_range]:
             for m in range(0,M):
                 if m<m_rl_distr[t-offset][:,:].shape[0]:
-                    model_posterior[m,i] = misc.logsumexp(
+                    model_posterior[m,i] = special.logsumexp(
                             m_rl_distr[t-offset][m,:])
         if not log_format:
             model_posterior = np.exp(model_posterior)
@@ -2195,160 +2195,3 @@ class EvaluationTool:
         if print_plt:
             plt.show()
         return figure
-
-    
-    
-
-#if __name__ == "__main__":
-#    #import matplotlib.pyplot as plt
-#    from BVAR_NIG_Sim import BVARNIGSim
-#    from BVAR_NIG import BVARNIG
-#    from cp_probability_model import CpModel
-#    
-#    """STEP 0: Def9ine overall params"""
-#    S1, S2, T = 2,2, 1500
-#    result_file = ("C:\\Users\\Jeremias\\Documents\\Studieren - " + 
-#                    "Inhaltliches\\OxWaSP PC backup\\Modules\\SpatialProject" + 
-#                    "\\Code\\SpatialBOCD\\Test_results_EvTool.txt")
-#    run_algo = False
-#    
-#    if run_algo:
-#        """STEP 1: Run simulation"""
-#        mySim = BVARNIGSim(S1=S1, S2=S2, T=T, CPs = 3, CP_locations = [400,700, 1100], 
-#                 sigma2 = np.array([1,1, 0.5, 1]), 
-#                 nbh_sequences = [ [0,0], [0,0], [0,0], [4,4] ],
-#                 restriction_sequences = [[0,0], [0,0], [0,0], [4,4]],
-#                 segment_types=["BVAR", "MGARCH", "VMA", "BVAR"],
-#                 intercept_groupings = None,
-#                 coefs =[ np.array([10, 0.6, -0.35]),
-#                          np.array([10, 0, 0]),
-#                          np.array([10,0,0]),
-#                          np.array([0.8, 0.25, 0.05, 0.3, 0.025])],
-#                 burn_in = 100,
-#                 padding = "row_col_mean")
-#  
-#        data = mySim.generate_all_segments()
-#        plt.plot(np.linspace(1,data.shape[0], data.shape[0]), data[:,0,0])
-#        plt.show()
-#    
-#    
-#        """STEP 2: Define the models"""
-#        myBVAR = BVARNIG(prior_a=2, prior_b=pow(10,3.5), 
-#                     prior_mean_beta=np.zeros(1+1), 
-#                     prior_var_beta=100* np.identity(1+1),
-#                     S1 = S1, S2 = S2, 
-#                     intercept_grouping = None, 
-#                     nbh_sequence=np.array([0]), 
-#                     nbh_sequence_exo=np.array([0]), 
-#                     exo_selection = [],
-#                     padding = 'overall_mean', 
-#                     auto_prior_update=False,
-#                     restriction_sequence = np.array([0])
-#                     )
-#        myBVAR2 = BVARNIG(prior_a=2, prior_b=pow(10,3.5), 
-#                     prior_mean_beta=np.zeros(1+4), 
-#                     prior_var_beta=100* np.identity(1+4),
-#                     S1 = S1, S2 = S2, 
-#                     intercept_grouping = None,
-#                     nbh_sequence=np.array([4,4]), 
-#                     nbh_sequence_exo=np.array([0]), 
-#                     exo_selection = [],
-#                     padding = 'overall_mean', 
-#                     auto_prior_update=False,
-#                     restriction_sequence = np.array([4,4])
-#                     )
-#    
-#        """STEP 3: Put them in the detector and run algo"""
-#        model_universe = np.array([myBVAR, myBVAR2])
-#        model_prior = np.array([0.5, 0.5])
-#        intensity = 50
-#        cp_model = CpModel(intensity)
-#        
-#        myDetector = Detector(data, model_universe, model_prior, cp_model, 
-#                 S1, S2, T, exo_data=None, num_exo_vars=None, threshold = -50,
-#                 store_rl = True, store_mrl = True)
-#        myDetector.run()
-    
-    
-#    """STEP 3: Put the detector inside of an EvaluationTool object and try
-#               some fcts. (read/write and plotting)"""
-#    myTool = EvaluationTool()
-#    myTool.build_EvaluationTool_via_run_detector( myDetector, 
-#            true_CP_location=[0, 400, 700, 1100], true_CP_model_index = [0, 1, 2,0], 
-#            true_CP_model_label = ["BVAR", "MGARCH", "VMA", "BVAR"])
-#
-#    #Test 1: Can we store results?    
-#    myTool.store_results_to_HD(result_file)
-#    
-#    #play with rl distr
-#    
-#    t_ = 400
-#    #check what cdf looks like
-#    rld = myTool.results[myTool.names.index("all run length log distributions")]
-#    non_inf_rld = rld[t_][np.where(rld[t_] > (-np.inf))]
-#    L = np.size(non_inf_rld)
-#    myA = -np.inf * np.ones(L)
-#    for i in range(0, L):
-#        myA[i] = misc.logsumexp(non_inf_rld[:(i+1)])
-#    plt.plot(np.linspace(1,L,L), myA)
-#
-#    
-    #Test 2: Can we read them into a (new) Evaluation tool object?
-    #myTool2 = EvaluationTool()
-    #myTool2.build_EvaluationTool_via_results(result_file) 
-    
-    #Test 3: can we plot what we want? Are the plots the same with Tool2?
-#    myFig = myTool.plot_raw_TS(data, indices=[0], print_plt=True, legend=True, 
-#                       legend_labels = None, legend_position=None, 
-#                       time_range=None)
-#    myFig.savefig("raw series.pdf")
-#    #Q: Why are the CPs not in myTool2?
-#    myTool2.plot_raw_TS(indices=[0], print_plt=True, legend=False, 
-#                       legend_labels = None, legend_position=None, 
-#                       time_range=None)
-#    myFig2 = myTool.plot_predictions(indices=[0], print_plt=True, legend=True, 
-#                    legend_labels = None, legend_position="upper right", 
-#                    time_range=None,show_var=True, show_CPs=True)
-#    myFig2.savefig("predictions.pdf")
-#    myTool2.plot_predictions(indices=[0], print_plt=True, legend=False, 
-#                    legend_labels = None, legend_position=None, 
-#                    time_range=None,show_var=True, show_CPs=True)
-#    myFig3 = myTool.plot_run_length_distr(print_plt = True, time_range = None,
-#                              show_MAP_CPs = False, show_real_CPs = False,
-#                              mark_median = False, log_format = True,
-#                              CP_legend = False)
-#    myFig3.savefig("runlengthdistro.pdf")
-#    myTool2.plot_run_length_distr(print_plt = True, time_range = None,
-#                              show_MAP_CPs = True, show_real_CPs = False,
-#                              mark_median = False, log_format = True,
-#                              CP_legend = False)
-#    
-#    #NOT DEBUGGED YET, not sure what is wrong here.
-#    myTool.plot_model_and_run_length_distr(print_plt = True, time_range = None,
-#                              show_MAP_CPs = True, show_real_CPs = False,
-#                              mark_median = True, log_format = True,
-#                              CP_legend = False)
-#    myTool2.plot_model_and_run_length_distr(print_plt = True, time_range = None,
-#                              show_MAP_CPs = True, show_real_CPs = False,
-#                              mark_median = True, log_format = True,
-#                              CP_legend = False)
-#    
-    #Test 4: 
-
-#    
-#    """plot the data from segment"""
-#    plt.plot(np.linspace(1,data.shape[0], data.shape[0]), data[:,0,0])
-#    plt.show()
-#    plt.plot(np.linspace(1,data.shape[0], data.shape[0]), data[:,1,0])
-#    plt.show()
-#    plt.plot(np.linspace(1,data.shape[0], data.shape[0]), data[:,0,1])
-#    plt.show()
-#    plt.plot(np.linspace(1,data.shape[0], data.shape[0]), data[:,1,1])
-#    plt.show()
-#
-#    
-#    
-#            
-
-
-

@@ -2142,7 +2142,7 @@ class BVARNIGDPD(BVARNIG):
             P(r_t|y_1:t, m_t) = P(r_t,y_1:t,m_t)\P(y_1:t, m_t), where we get
             P(y_1:t, m_t) = P(y_1:t|m_t)P(m_t) by summing the joint probs"""
             self.model_log_evidence_p_eps = (
-                scipy.misc.logsumexp(joint_log_probs))
+                scipy.special.logsumexp(joint_log_probs))
             
             """STEP 2.3: Get the posterior expectation for alpha + eps, i.e.
             E[y_t+1|y_1:t, m_t, alpha_t + eps]. On the detector level, we 
@@ -2179,7 +2179,7 @@ class BVARNIGDPD(BVARNIG):
             
             """STEP 3.2: as before"""
             self.model_log_evidence_m_eps = (
-                    scipy.misc.logsumexp(joint_log_probs))
+                    scipy.special.logsumexp(joint_log_probs))
             
             """STEP 3.3: Get the posterior expectation for alpha + eps"""
             self.post_mean_m_eps = np.sum(
@@ -2319,7 +2319,7 @@ class BVARNIGDPD(BVARNIG):
 
         self.retained_run_lengths = (
                     self.retained_run_lengths[kept_run_lengths])
-        self.model_log_evidence = scipy.misc.logsumexp(
+        self.model_log_evidence = scipy.special.logsumexp(
                         self.joint_log_probabilities )
         
         
@@ -2459,7 +2459,7 @@ class BVARNIGDPD(BVARNIG):
                     ))
             else:
                 sign = np.sign(E3)*np.sign(K)
-                sum_, sign_ = scipy.misc.logsumexp(
+                sum_, sign_ = scipy.special.logsumexp(
                         a = np.log(np.abs(E3)) + (an + 0.5*d*alpha)*(np.log(bn) - 
                                    np.log(np.abs(K))),
                         b = sign,
@@ -2814,7 +2814,7 @@ class BVARNIGDPD(BVARNIG):
                 else:  
                     signs = np.sign(E3) * np.sign(K)
                     sum_1_log, sign =   ( #E2der_m_ba * (
-                        scipy.misc.logsumexp(
+                        scipy.special.logsumexp(
                             a = (
                                 np.log(np.abs(E3)) 
                                 #(self.a_rt[r] + 0.5*self.num_regressors*alpha)*
@@ -2839,7 +2839,7 @@ class BVARNIGDPD(BVARNIG):
                     
                     if np.size(Klarger0)>0:
                         sign_ = np.sign(np.log(K[Klarger0]))*np.sign(E3[Klarger0])
-                        exact_der_part_log, sign_edpl = scipy.misc.logsumexp(
+                        exact_der_part_log, sign_edpl = scipy.special.logsumexp(
                                 a = ( np.log(np.abs(E3[Klarger0])) 
                                       + (an + 0.5*d*alpha)*
                                          (np.log(bn) - np.log(K[Klarger0]))
@@ -2860,7 +2860,7 @@ class BVARNIGDPD(BVARNIG):
                             (bn/K)^([an - eps] + 0.5d*alpha )."""
                     if np.size(Ksmaller0):
                         eps = pow(10,-5)
-                        diff_log, diff_log_sign = scipy.misc.logsumexp(
+                        diff_log, diff_log_sign = scipy.special.logsumexp(
                                 a = np.array([
                                         (an + eps + 0.5*d*alpha) * (
                                             np.log(bn) - np.log(np.abs(K[Ksmaller0]))), 
@@ -2877,7 +2877,7 @@ class BVARNIGDPD(BVARNIG):
                         """Using the above, get the sum of the numerical gradient
                         parts for which K was smaller than 0."""
                         sig = diff_log_sign * np.sign(E3[Ksmaller0])
-                        numerical_der_part_log, sign_ndpl = scipy.misc.logsumexp(
+                        numerical_der_part_log, sign_ndpl = scipy.special.logsumexp(
                                 a = (np.log(np.abs(E3[Ksmaller0])) + diff_log + 
                                      -np.log((2*eps))),
                                 b = sig,
@@ -2890,7 +2890,7 @@ class BVARNIGDPD(BVARNIG):
                             
                     """Finally, get the full sum of derivatives for both the K>0 
                     and K<0 terms"""
-                    sum_part, sum_sgn = scipy.misc.logsumexp(
+                    sum_part, sum_sgn = scipy.special.logsumexp(
                             a = np.array([exact_der_part_log,
                                          numerical_der_part_log]),
                             b = np.array([sign_edpl, sign_ndpl]),
@@ -3076,7 +3076,7 @@ class BVARNIGDPD(BVARNIG):
                 else:            
                             
                     sig = (np.sign(E3) * np.sign(K) )#np.maximum(K, pow(10,-5)))))
-                    sum_1_log, sign_ = scipy.misc.logsumexp(
+                    sum_1_log, sign_ = scipy.special.logsumexp(
                             a = (
                                 np.log(np.abs(E3))
                                 + (np.log(bn) - np.log(np.abs(K)))#np.maximum(K, pow(10,-5))))) 
@@ -3095,7 +3095,7 @@ class BVARNIGDPD(BVARNIG):
                 
                 #RUNTIME OVERFLOW due to E2 and self.K [b^a]   
                     sign = np.sign(E3) * np.sign(K)
-                    sum_2_log, sign_ = scipy.misc.logsumexp(
+                    sum_2_log, sign_ = scipy.special.logsumexp(
                             a = (np.log(np.abs(E3)) + (an + 0.5*alpha+1)*(
                                     np.log(bn) - np.log(np.abs(K)))),
                             b = sign,
@@ -3242,7 +3242,7 @@ class BVARNIGDPD(BVARNIG):
                     #DEBUG: Somehow, an error occurs here 'divide by zero in log'
                     #       which means we get log(0) somewhere. Internally that is
                     #       solved by assigning -np.inf, so there is no issue here
-                    sum_1_log, sign_ = scipy.misc.logsumexp(
+                    sum_1_log, sign_ = scipy.special.logsumexp(
                             a = (np.log(np.abs(E3))[:,np.newaxis] 
                                  + np.log(np.abs(E4der + E5der +E7der))
                                  + (an + 0.5*alpha+1)*(
@@ -3413,7 +3413,7 @@ class BVARNIGDPD(BVARNIG):
                 """STEP 3: Log-transformed summation"""
                 sum_1_signs = np.sign(E3der) * np.sign(K)[:,np.newaxis]
                 #needs to be multiplied by E2_m_ba later
-                sum_1, sum_1_sign = scipy.misc.logsumexp(
+                sum_1, sum_1_sign = scipy.special.logsumexp(
                         a = (np.log(np.abs(E3der))  
                             + (np.log(bn) - np.log(np.abs(K)))[:,np.newaxis]*(an + 0.5*d*alpha)
                             - np.log(bn) * (0.5*d*alpha)),
@@ -3424,7 +3424,7 @@ class BVARNIGDPD(BVARNIG):
                         
                 sum_2_signs = np.sign(E4to7der) * np.sign(K)[:,np.newaxis] * (-1)
                 #needs to be multiplied by E2_m_ba later
-                sum_2, sum_2_sign = scipy.misc.logsumexp(
+                sum_2, sum_2_sign = scipy.special.logsumexp(
                         a = (np.log(E3)[:,np.newaxis]
                             + np.log(0.5)
                             + np.log(np.abs(E4to7der)) 
@@ -3439,7 +3439,7 @@ class BVARNIGDPD(BVARNIG):
                 
                 sum_3_signs = np.sign(K)
                 #needs to be multiplied by E2der_m_ba later
-                sum_3, sum_3_sign = scipy.misc.logsumexp(
+                sum_3, sum_3_sign = scipy.special.logsumexp(
                         a = (np.log(E3)
                             + (np.log(bn) - np.log(np.abs(K))) * (an + 0.5 * d * alpha)
                             - np.log(bn) * (0.5 * d * alpha)),
@@ -3448,7 +3448,7 @@ class BVARNIGDPD(BVARNIG):
                         axis=0
                     )
                 
-                sum_sum, sum_sum_sign = scipy.misc.logsumexp(
+                sum_sum, sum_sum_sign = scipy.special.logsumexp(
                         a=np.array([sum_1, sum_2]),
                         b=np.array([sum_1_sign, sum_2_sign]),
                         return_sign = True,
@@ -3475,23 +3475,8 @@ class BVARNIGDPD(BVARNIG):
                     * E4to7der)
                 
                 individual_grads_L = (sum_part_1 + sum_part_2 + sum_part_3 + 
-                                      prior_weight*E1der )
-                
-            
-#            #Test if full_sum = sum_ders
-#            if np.any(full_sum != sum_ders):
-##                print("full sum:", full_sum)
-##                print("sum ders", sum_ders)
-##                print("full sum 2:", full_sum2)
-#                #print("sum 1 no logs", sum_1_)
-#                print("sum 1 logs", E2_m_ba * np.exp(sum_1) * sum_1_sign)
-#                #print("sum 2 no logs", sum_2_)
-#                print("sum 2 logs", E2_m_ba * np.exp(sum_2) * sum_2_sign)
-#                #print("sum 3 no logs", sum_3_)
-#                print("sum 3 logs", E2der_m_ba * np.exp(sum_3) * sum_3_sign)
-            
-            """STEP 3: Add the last remaining term and return everything"""
-             #full_sum #sum_ders
+                                      prior_weight*E1der)
+
         elif num_obs <= 0:
             ELBOder_L = prior_weight*E1der
             individual_grads_L = prior_weight * E1der
@@ -3499,814 +3484,3 @@ class BVARNIGDPD(BVARNIG):
             return ELBOder_L #ELBOder_L
         elif not return_sum:
             return individual_grads_L
-        
-        
-        
-#***************DEPRECATED GRADIENT FUNCTIONS********************    
-#
-#DEPRECATED! OLD MANUAL OPTIMIZATION
-#    def take_step_VB(self, r, num_obs, count, alpha = None):
-#        """This function (1) calls the gradient evaluations for all VB params,
-#        (2) computes the step size from old iterations, and (3) takes the steps
-#        to update a, b, beta, L accordingly"""
-#        
-#        """Unless otherwise specified, work with self.alpha_param"""
-#        if alpha is None:
-#            alpha = self.alpha_param
-#        
-#        """STEP 1: Compute gradients of a_rt, b_rt, beta_rt, L_rt"""
-#        gradient_a = self.get_gradient_a(r=r, num_obs=num_obs,  alpha=alpha)     
-#        gradient_b = self.get_gradient_b(r=r, num_obs=num_obs, alpha=alpha)     
-#        gradient_beta = self.get_gradient_beta(r=r,num_obs=num_obs,alpha=alpha)     
-#        gradient_L = self.get_gradient_L(r=r, num_obs=num_obs, alpha=alpha)   
-#        
-#        """If true, then we compute the numerical gradients here and compare 
-#        them to the direct gradients as derived in the appendix"""
-#        DEBUG_gradients_SGD = False
-#        if DEBUG_gradients_SGD:
-#            
-#            #Build stuff we need to evaluate the gradient numerically
-#            num_grads = (self.num_regressors + 
-#                int(self.num_regressors * (self.num_regressors+1) * 0.5) + 2)
-#            turb = pow(10,-3) #beta, L, a, b is order of perturb
-#            
-#            perturbation = np.zeros(num_grads)
-#            grad_beta = np.zeros(self.num_regressors)
-#            grad_L = np.zeros(int(self.num_regressors * 
-#                                  (self.num_regressors+1) * 0.5))
-#            
-#            turb = pow(10,-3)
-#            perturbation[-1] = turb
-#            elbobp = self.get_ELBO( perturbation, r, num_obs)
-#            elbobm = self.get_ELBO( -perturbation, r, num_obs)
-#            grad_b = (elbobp - elbobm)/(2 * turb)
-#            #log_grad_b = (np.log(-elbobp) - np.log(-elbobm))/(2 * turb)
-#            
-#            #a
-#            turb = pow(10,-3)
-#            perturbation[-1] = 0
-#            perturbation[-2] = turb
-#            elboap = self.get_ELBO( perturbation, r, num_obs)
-#            elboam = self.get_ELBO( -perturbation, r, num_obs)
-#            grad_a = (elboap - elboam)/(2 * turb)
-#            #log_grad_a = (np.log(-elboap) - np.log(-elboam))/(2 * turb)
-#            
-#            #beta
-#            turb = pow(10,-3)
-#            perturbation[-2] = 0
-#            for i in range(0, self.num_regressors):
-#                perturbation[i] = turb
-#                elbobetap = self.get_ELBO( perturbation, r, num_obs)
-#                elbobetam = self.get_ELBO( -perturbation, r, num_obs)
-#                perturbation[i] = 0
-#                grad_beta[i] = (elbobetap - elbobetam)/(2 * turb)
-#                #log_grad_beta[i] = (np.log(-elbobetap) - np.log(-elbobetam))/(2 * turb)
-#                
-#            #L
-#            for i in range(0,int(self.num_regressors * (self.num_regressors+1) * 0.5)):
-#                perturbation[i + self.num_regressors] = turb
-#                elboLp = self.get_ELBO( perturbation, r, num_obs)
-#                elboLm = self.get_ELBO( -perturbation, r, num_obs)
-#                perturbation[i+ self.num_regressors] = 0
-#                grad_L[i] = (elboLp - elboLm)/(2 * turb)
-#                #log_grad_L[i] = (np.log(-elboLp) - np.log(-elboLm))/(2 * turb)
-#            
-#            #print gradients for numerical approx if deviation significant
-#            if (abs(gradient_a - grad_a) > 0.25 or abs(gradient_b - grad_b) > 0.25 or
-#                np.max(np.abs(gradient_beta - grad_beta))>0.25 or
-#                np.max(np.abs(gradient_L - grad_L))>0.25):
-#                print("NUMERICAL GRADIENTS ELBO SIGNIFICANTLY DIFFERENT!")
-#                print("a diff:", abs(gradient_a - grad_a))
-#                print("b diff:", abs(gradient_b - grad_b))
-#                print("beta diff:", np.max(np.abs(gradient_beta - grad_beta)))
-#                print("L diff:", np.max(np.abs(gradient_L - grad_L)))
-#                # print("NUMERICAL GRADIENTS LOG ELBO")
-#                #print(log_grad_a)
-#                #print(log_grad_b)
-#                #print(log_grad_beta)
-#                #print(log_grad_L)
-#                print("t - lag length = ", self.retained_run_lengths.shape[0] - self.lag_length)
-#                print("current values")
-#                print("a", self.a_rt[r])
-#                print("b", self.b_rt[r])
-#                print("beta", self.beta_rt[r,:])
-#                print("L", self.L_rt[r,:,:])
-#                print("DIRECT GRADIENTS")
-#                print("a",gradient_a)
-#                print("b",gradient_b)
-#                print("beta",gradient_beta)
-#                print("L",gradient_L)
-#                print("NUMERICAL GRADIENTS ELBO")
-#                print("a", grad_a)
-#                print("b", grad_b)
-#                print("beta", grad_beta)
-#                print("L", grad_L)
-#        
-#        """Similar to what we do on top, but we compare numerical gradients to
-#        the direct gradients we use inside the python optimization"""
-#        DEBUG_gradients_optimizer = False
-#        if DEBUG_gradients_optimizer:
-#            #compare the static methods with object-internatl gradients
-#
-#            alpha, p = self.alpha_param, self.num_regressors
-#            old_params = np.zeros(int(p*(p+1)*0.5) + p + 2)
-#            old_params[0], old_params[1] = self.a_rt[r], self.b_rt[r]
-#            old_params[2:(p+2)] = self.beta_rt[r,:]
-#            old_params[(p+2):] = self.L_rt[r,:,:][np.tril_indices(p, 0)]
-#            
-#            #priors
-#            a0,b0 = self.a, self.b
-#            beta0, L0 = self.prior_mean_beta, self.L_0 #don't think we ever need it
-#            Sig0inv = self.prior_var_beta_inv
-#            
-#            #precomputed values
-#            K, E3, Rinv, E2_m_ba = self.K, self.E3, self.Rinv, self.E2_m_ba
-#            digamma_diff_1, digamma_diff_2 = self.digamma_diff_1, self.digamma_diff_2
-#            gamma_ratio_2 = self.gamma_ratio_2
-#            downweight1, downweight2 = self.downweight1, self.downweight2
-#            XX_t, XY_t, YY_t = self.XX_t, self.XY_t, self.YY_t
-#            d = self.S1 *  self.S2
-#            
-#            args = (a0, b0, beta0, Sig0inv, 
-#                alpha, num_obs, p,
-#                K, E3, Rinv, E2_m_ba, 
-#                digamma_diff_1, digamma_diff_2, gamma_ratio_2,
-#                downweight1, downweight2,
-#                XX_t,XY_t,YY_t, 
-#                L0, d)
-#            #compute grads and the elbo
-#            grad2_a = BVARNIGDPD.get_grad_a(old_params, 
-#                *args)
-#            grad2_b = BVARNIGDPD.get_grad_b( old_params, 
-#                *args) 
-#            grad2_beta = BVARNIGDPD.get_grad_beta( old_params, 
-#                *args) 
-#            grad2_L = BVARNIGDPD.get_grad_L( old_params, 
-#                *args)
-#            elbo = BVARNIGDPD.ELBO_fun(old_params, 
-#                *args)
-#            elbo_obj = self.get_ELBO(perturbation = np.zeros(
-#                    int(p*(p+1)*0.5) + p + 2), r=r, num_obs=num_obs)
-#            
-#            #comparison
-#            print("STATIC VS OBJECT")
-#            print("a diff:", abs(gradient_a - grad2_a))
-#            print("b diff:", abs(gradient_b - grad2_b))
-#            print("beta diff:", np.max(np.abs(gradient_beta - grad2_beta)))
-#            print("L diff:", np.max(np.abs(gradient_L - grad2_L)))
-#            print("elbo diff:", abs(elbo-elbo_obj))
-#
-#
-#        """STEP 2: Compute step sizes and increments"""
-#        
-#        """STEP 2.1: Compute step sizes"""
-#        if count == 0:
-#            """If first step, cannot use knowledge of previous step sizes"""
-#            step_size_a = 1.0
-#            step_size_b = 1.0
-#            step_size_beta = 1.0
-#            step_size_L = 1.0
-#        else:
-#            
-#            BB_steps= False
-#            if BB_steps:
-#                """If true, use BB approach, appropriate step size via 
-#                Barzilai and Borwein (BB), see also 
-#                ftp://lsec.cc.ac.cn/pub/yyx/papers/p0504.pdf"""
-#                
-#                """STEP 2.1.1: For a"""
-#                gradient_a_increment = gradient_a - self.old_gradient_a
-#                a_increment = self.new_a - self.old_a
-#                step_size_a = ((a_increment * gradient_a_increment)/
-#                               (gradient_a_increment * gradient_a_increment))
-#                
-#                """STEP 2.1.2: For b"""
-#                gradient_b_increment = gradient_b - self.old_gradient_b
-#                b_increment = self.new_b - self.old_b
-#                step_size_b = ((b_increment * gradient_b_increment)/
-#                               (gradient_b_increment * gradient_b_increment))
-#                
-#                """STEP 2.1.3: For beta"""
-#                gradient_beta_increment = gradient_beta - self.old_gradient_beta
-#                beta_increment = self.new_beta - self.old_beta
-#                step_size_beta = (np.inner(beta_increment, 
-#                    gradient_beta_increment)/
-#                    np.inner(gradient_beta_increment, gradient_beta_increment))
-#                
-#                """STEP 2.1.4: For L"""
-#                gradient_L_increment = gradient_L - self.old_gradient_L
-#                L_increment = ( (self.new_L - self.old_L )[
-#                        np.tril_indices(self.num_regressors, 0)])
-#                step_size_L = (np.inner(L_increment, 
-#                        gradient_L_increment)/
-#                        np.inner(gradient_L_increment, gradient_L_increment))
-#            else:
-#                step_size_a, step_size_b = 1.0/count, 1.0/count
-#                step_size_beta, step_size_L = 1.0/count, 1.0/count
-#
-#            
-#        """STEP 2.2: store gradient values for next iteration's step sizes"""
-#        self.old_gradient_a = gradient_a
-#        self.old_gradient_b = gradient_b
-#        self.old_gradient_beta = gradient_beta
-#        self.old_gradient_L = gradient_L
-#        
-#        
-#        """STEP 3: Take the step into the gradient direction"""
-#        
-#        """STEP 3.1: Get the increments for each VB parameter"""
-#        increment_a = gradient_a * step_size_a   
-#        increment_b = gradient_b * step_size_b
-#        increment_beta = gradient_beta * step_size_beta
-#        increment_L = gradient_L * step_size_L
-#        
-#        
-#        """STEP 3.2: Update the values of the VB parameters"""
-#        
-#        """STEP 3.2.1: Do it for a"""
-#        self.a_rt[r] = min(max(self.a_rt[r] + increment_a, 1.0001), pow(10,6)) #we want a>1
-#
-#        if count == 0:
-#            self.new_a = self.a_rt[r] #i.e., we store only the updated value
-#        else:
-#            self.old_a = self.new_a 
-#            self.new_a = self.a_rt[r]
-#            
-#        """STEP 3.2.2: Do it for b"""
-#        self.b_rt[r] = min(max(self.b_rt[r] + increment_b, 1.0001), pow(10,6)) #we want b>0
-#        
-#        if count == 0:
-#            self.new_b = self.b_rt[r] #i.e., we store only the updated value
-#        else:
-#            self.old_b = self.new_b 
-#            self.new_b = self.b_rt[r]
-#            
-#        """STEP 3.2.3: Do it for beta"""
-#        self.beta_rt[r,:] = self.beta_rt[r,:] + increment_beta
-#        
-#        if count == 0:
-#            self.new_beta = self.beta_rt[r,:] #i.e., we store only the updated value
-#        else:
-#            self.old_beta = self.new_beta.copy()
-#            self.new_beta = self.beta_rt[r,:]
-#        
-#        """STEP 3.2.4: Do it for L"""
-#        lower_ind = np.tril_indices(self.num_regressors, 0)       
-#        self.L_rt[r,:,:][lower_ind] = self.L_rt[r,:,:][lower_ind] + increment_L
-#        
-#        if count == 0:
-#            self.new_L = self.L_rt[r,:,:] #i.e., we store only the updated value
-#        else:
-#            self.old_L = self.new_L.copy()
-#            self.new_L = self.L_rt[r,:,:]
-#        
-#    #DEPRECATED!
-#    def get_gradient_a(self, r, num_obs, alpha = None, prior_weight = 1):
-#        # an, bn, betan, vech_Ln, p, num_obs, alpha,  a0, b0, beta0, vechL0, 
-#        #                         K, E3, Rinv
-#        """Gradient of ELBO w.r.t. IG-a based on the last r observations
-#        I.e., for r = 0, we would simply have the prior. For r = 3, we would 
-#        compute the full gradient based on X_t, X_t-1, X_t-2.
-#        NOTE: Using notation of the appendix for the NIPS submission, 
-#        see details for the expressions (and how to arrive there) there
-#        """
-#        
-#        """Unless otherwise specified, work with value of alpha_param"""
-#        if alpha is None:
-#            alpha = self.alpha_param
-#        
-#        """STEP 1: Compute the prior-dependent (data-independent) quantities
-#        Note that the derivatives of E_9 and E_10 cancel except for the 
-#        trigamma term. So we give E10_der with only said trigamma term."""
-#        #RUNTIME OVERFLOW due to E2 (which is in E2der) and self.K [b^a]
-#        d = self.S1*self.S2
-#        E2der_m_ba = self.E2_m_ba*(self.digamma_diff_2 + np.log(self.b_rt[r]))
-#        E8der =  (-0.5 * (np.inner(self.prior_mean_beta - self.beta_rt[r,:],
-#                            np.matmul(self.prior_var_beta_inv, 
-#                             self.prior_mean_beta - self.beta_rt[r,:]
-#                            )
-#                        ) 
-#                        + 2*(self.b - self.b_rt[r])
-#                        )
-#                 * (1.0/self.b_rt[r]) 
-#                 *  self.gamma_ratio_1 
-#                 *  self.digamma_diff_1)
-#        E9der = -np.log(self.b_rt[r]) + scipy.special.digamma(self.a_rt[r])            
-#        E10der = ( np.log(self.b_rt[r]) - scipy.special.digamma(self.a_rt[r])
-#                    -(self.a_rt[r] - self.a) 
-#                      * scipy.special.polygamma(1, self.a_rt[r]))
-#        E11der = -(
-#                    (num_obs * self.gamma_ratio_2 * self.digamma_diff_2 )
-#                    * pow(self.b_rt[r] * 2.0 * np.pi, 
-#                            -0.5*d * alpha) 
-#                    * pow(1.0 + alpha, 
-#                              -0.5*d - 1)
-#                )
-#        
-#        """STEP 2: Compute the data-dependent quantitites
-#        Note: The heavy lifting for this is done in the pre-computation"""
-#        #RUNTIME OVERFLOW due to E2 (which is in E2der) and self.K [b^a]
-#        if num_obs > 0:
-#            
-#            sum_1 = (E2der_m_ba 
-#                         * self.downweight1
-#                         * np.sum(self.E3 
-#                            * np.power(self.b_rt[r]/self.K, 
-#                                self.a_rt[r] + 0.5*d*alpha)
-#                         )
-#                    )
-#                            
-#                                   
-#    
-#            signs = np.sign(self.E3) * np.sign(self.K)
-#            sum_1_log, sign =   ( #E2der_m_ba * (
-#                scipy.misc.logsumexp(
-#                    a = (
-#                        np.log(np.abs(self.E3)) +
-#                        #(self.a_rt[r] + 0.5*self.num_regressors*alpha)*
-#                        #    np.abs(np.log(b)),
-#                        (np.log(self.b_rt[r]) - np.log(np.abs(self.K))) * 
-#                            (self.a_rt[r] + 0.5*d*alpha) 
-#                        #
-#                    ),
-#                    axis=0, 
-#                    b = signs,
-#                    return_sign = True
-#
-#                    )
-#                )
-#                    
-#            sum_1_ = sign * np.exp(sum_1_log - (0.5*d*alpha) * np.log(self.b_rt[r])) * E2der_m_ba
-#            
-#                    
-#            sum_2 = (
-#                    self.E2_m_ba * (-1.0) 
-#                    * self.downweight1
-#                    * np.sum(self.E3 * 
-#                        np.power(self.b_rt[r]/self.K, 
-#                                 self.a_rt[r] + 0.5*d*alpha)
-#                        #DEBUG: Force K > 0
-#                        *  np.log(self.K) 
-#                    )
-#                ) 
-#            
-#            signs_ = np.sign(self.E3) * np.sign(self.K) * np.sign(np.log(self.K))
-#            sum_2_log, sign_ = (
-#                    scipy.misc.logsumexp(
-#                        a = (
-#                            np.log(np.abs(self.E3))  
-#                            + (np.log(self.b_rt[r]) - np.log(np.abs(self.K)))
-#                                *(self.a_rt[r] + 0.5*d*alpha)
-#                            + np.log(np.abs(np.log(self.K)))
-#                            ),
-#                        b = signs_,
-#                        axis=0,
-#                        return_sign=True
-#                        )
-#                )
-#                      
-#            
-#        else:
-#            sum_1, sum_2 = 0.0, 0.0
-#        #DEBUG: Presupposes that self.K is positive in every entry!
-#        #       not sure this holds, need some precaution!
-#        #DEBUG: Give a warning whenever some entries of K are negative!
-#        if np.sum(self.K < 0 ) > 0 and num_obs > 0:
-#            print("number of negative K entries: ", np.sum(self.K < 0 ))
-#                        
-#        """STEP 3: Sum up everything and return it"""
-#        ELBOder_a = prior_weight*(E8der + E9der + E10der + E11der) + sum_1 + sum_2
-#        return ELBOder_a #  ELBOder_a #E8der +E9der + E10der + E11der #ELBOder_a
-#    
-#    
-#    #DEPRECATED!
-#    def get_gradient_b(self, r, num_obs, alpha, prior_weight = 1):
-#        """Gradient of ELBO w.r.t. IG-a based on the last r observations
-#        I.e., for r = 0, we would simply have the prior. For r = 3, we would 
-#        compute the full gradient based on X_t, X_t-1, X_t-2.
-#        NOTE: Using notation of the appendix for the NIPS submission, 
-#        see details for the expressions (and how to arrive there) there
-#        """    
-#        
-#        """Unless otherwise specified, work with value of alpha_param"""
-#        if alpha is None:
-#            alpha = self.alpha_param
-#        
-#        """STEP 1: Compute the prior-dependent (data-independent) quantities,
-#        i.e. the derivatives of E_2, E_8,E_9,E_10,E_11. Note that the sum of
-#        the derivatives of E_9 and E_10 is -a0/bn, so we only give E10der"""
-#        d = self.S1*self.S2
-#        E2der_m_ba = self.E2_m_ba * (self.a_rt[r]/self.b_rt[r])
-#        E8der = ( 0.5  * (np.inner(self.prior_mean_beta - self.beta_rt[r,:],
-#                                    np.matmul(self.prior_var_beta_inv, 
-#                                      self.prior_mean_beta - self.beta_rt[r,:]
-#                                    )
-#                                )
-#                            #- 2*self.b
-#                          )
-#                        * (1.0/pow(self.b_rt[r],2)) 
-#                        * self.gamma_ratio_1
-#                 ) 
-#        E8der = E8der + self.b * (1.0/pow(self.b_rt[r],2)) * self.gamma_ratio_1
-#        E10der = -(self.a/self.b_rt[r])
-#        E9der = -(self.a_rt[r]/self.b_rt[r])
-#        E10der = (self.a_rt[r] - self.a)/self.b_rt[r]
-#        E10der = E9der + E10der
-#        E11der =  ( 
-#                (
-#                    (num_obs * 0.5 * d * alpha) 
-#                    * self.gamma_ratio_2
-#                )
-#                *
-#                (
-#                    pow(2 * np.pi, -0.5 * d * alpha) 
-#                    * pow(1 + alpha, -0.5 * d - 1)
-#                    * self.downweight2
-#                )
-#            )
-#        
-#        """STEP 2: Compute the data-dependent quantitites
-#        Note: The heavy lifting for this is done in the pre-computation"""
-#        #RUNTIME OVERFLOW due to E2 (which is in E2der) and self.K [b^a]
-#        if num_obs > 0:
-#            sum_1 = (
-#                E2der_m_ba 
-#                    * self.downweight1
-#                    * np.sum(
-#                        self.E3 
-#                        * np.power(self.b_rt[r]/self.K, 
-#                               self.a_rt[r] + 0.5*d*alpha) 
-#                    )
-#                )
-#        
-#        #RUNTIME OVERFLOW due to E2 and self.K [b^a]               
-#            sum_2 = (
-#                self.E2_m_ba 
-#                * (-self.a_rt[r] - 0.5*d*alpha) 
-#                * self.downweight2
-#                * np.sum(self.E3 
-#                    * np.power(self.b_rt[r]/self.K, 
-#                        self.a_rt[r] + 0.5*d*alpha + 1) 
-#                  )
-#                )
-#        else:
-#            sum_1 = sum_2 = 0.0
-#        
-#        """STEP 3: Sum up everything and return it"""
-#        ELBOder_b = prior_weight*(E8der + E10der + E11der) + sum_1 + sum_2
-#        return ELBOder_b #ELBOder_b
-#    
-#    #DEPRECATED
-#    def get_gradient_beta(self, r, num_obs, alpha, prior_weight=1):
-#        """Gradient of ELBO w.r.t. beta based on the last r observations
-#        I.e., for r = 0, we would simply have the prior. For r = 3, we would 
-#        compute the full gradient based on X_t, X_t-1, X_t-2.
-#        NOTE: Using notation of the appendix for the NIPS submission, 
-#        see details for the expressions (and how to arrive there) there
-#        """    
-#        
-#        """Unless otherwise specified, work with value of alpha_param"""
-#        if alpha is None:
-#            alpha = self.alpha_param
-#        
-#        """STEP 1: Compute the prior-dependent (data-independent) quantities,
-#        i.e. the derivatives of E_4, E_8"""
-#        d = self.S1*self.S2
-#        E4der =( 2 * np.matmul(
-#                        np.matmul(
-#                               np.transpose(self.beta_rt[r,:]), 
-#                               self.L_rt[r,:,:]
-#                              ),
-#                        np.transpose(self.L_rt[r,:,:]) 
-#                    )
-#                ) 
-#        E8der = ( 
-#                    (1.0/self.b_rt[r]) * self.gamma_ratio_1
-#                     * np.matmul(
-#                        np.transpose(self.prior_mean_beta - self.beta_rt[r,:]),
-#                        self.prior_var_beta_inv, 
-#                    )
-#                 )
-#        """STEP 2: Compute the data-dependent quantitites
-#        Note: The heavy lifting for this is done in the pre-computation"""
-#        
-#        """STEP 2.1: Get the quantities that are functionals of the precomputed
-#        quantities R, the derivatives of E_{5,i} and E_{7,i}"""
-#        if num_obs > 0:            
-#            E7der = np.zeros((num_obs,self.num_regressors))
-#            E5der = np.zeros((num_obs, self.num_regressors))
-#            for i in range(0, num_obs):
-#                """COMPUTATIONAL NOTE: Probably:INEFFICIENT: Since both XY and 
-#                R in an array, s.t. I can do matrix mult along first axis?"""
-#                E5der[i,:] = np.matmul(E4der, self.Rinv[i,:,:])
-#                E5der[i,:] = np.matmul(E5der[i,:], (self.L_rt[r,:,:]))
-#                E5der[i,:] = -np.matmul(E5der[i,:], 
-#                                     np.transpose(self.L_rt[r,:,:]))
-#                E7der[i,:] = np.matmul(np.transpose(self.XY_t[i,:]),
-#                                  self.Rinv[i,:,:])
-#                E7der[i,:] = np.matmul(E7der[i,:], self.L_rt[r,:,:])
-#                E7der[i,:] = np.matmul(E7der[i,:], np.transpose(self.L_rt[r,:,:]))
-#
-#            E7der = -2 * alpha * E7der
-#            
-#            """STEP 2.2: Get the summed quantities that are themselves functionals
-#            of the previously derived E5der, E7der entries."""
-#            #RUNTIME OVERFLOW due to E2  and self.K [b^a]
-#            sum_1 = ( 
-#                        (-self.a_rt[r] -0.5*d*alpha)
-#                        * 0.5
-#                        * self.downweight2
-#                        * self.E2_m_ba * (
-#                        np.sum(
-#                            self.E3[:,np.newaxis]
-#                            * (E4der + E5der +E7der)
-#                            * np.power(self.b_rt[r]/self.K, 
-#                                self.a_rt[r] + 0.5*d*alpha + 1)[:,np.newaxis]
-#                            , axis=0    
-#                        )            
-#                    )
-#                )
-#        
-#            """STEP 3: Sum up everything and return it"""
-#            ELBOder_beta = prior_weight*E8der + sum_1
-#        elif num_obs <= 0:
-#            ELBOder_beta = prior_weight * E8der
-#            
-#        return ELBOder_beta 
-#    
-#    #DEPRECATED
-#    def get_gradient_L(self, r, num_obs,  alpha, prior_weight = 1):
-#        """Gradient of ELBO w.r.t. L based on the last r observations
-#        I.e., for r = 0, we would simply have the prior. For r = 3, we would 
-#        compute the full gradient based on X_t, X_t-1, X_t-2.
-#        NOTE: Using notation of the appendix for the NIPS submission, 
-#        """    
-#        
-#        """Unless otherwise specified, work with value of alpha_param"""
-#        if alpha is None:
-#            alpha = self.alpha_param
-#        
-#        """STEP 1: Compute the prior-dependent (data-independent) quantities,
-#        i.e. the derivatives of E1, E2, E_4"""
-#        d = self.S1*self.S2
-#        lower_ind = np.tril_indices(self.num_regressors, 0)  
-#        B = np.outer(self.beta_rt[r,:], self.beta_rt[r,:])
-#        L_inv = scipy.linalg.lapack.clapack.dtrtri(self.L_rt[r,:,:], 1)[0]
-#        E1der = (np.matmul(
-#                         (np.matmul(
-#                                np.matmul(np.transpose(L_inv), L_inv),
-#                                self.prior_var_beta_inv
-#                            )
-#                         -  np.identity(self.num_regressors)),
-#                            np.transpose(L_inv)
-#                        )[lower_ind]     )                  
-#        E2der_m_ba = self.E2_m_ba * np.transpose(L_inv)[lower_ind] 
-#        E4der = 2.0 * np.matmul(B, self.L_rt[r,:,:])[lower_ind]
-#    
-#        """STEP 2: Compute the data-dependent quantitites.
-#        For efficiency, compute the entire derivative term inside the sum
-#        observation by observation. I.e., we directly compute the two sums
-#        depending on derivatives of E_{3,i}, E_4, E_{5,i}, E_{6,i}, E_{7,i}"""
-#        
-#        """COMPUTATIONAL NOTE: INEFFICIENT, 
-#        maybe one can vectorize these operations? I.e., perform all of this in
-#        one line (using np.einsum, e.g.) instead of doing it in a loop"""
-#        if num_obs > 0:
-#            sum_ders = np.zeros(int(self.num_regressors*
-#                                    (self.num_regressors+1)*0.5))
-#            for i in range(0,num_obs):
-#                """STEP 2.1: Compute auxiliary quantities needed for derivatives of 
-#                E_{3,i}, E_4, E_{5,i}, E_{6,i}, E_{7,i}, namely A1 - A6"""
-#                A1 = np.matmul(self.Rinv[i,:,:], self.L_rt[r,:,:])
-#                A2 = np.matmul(A1, np.transpose(self.L_rt[r,:,:]))
-#                A3 = np.matmul(A2, B)
-#                A4 = np.matmul(self.Rinv[i,:,:], self.XY_t[i,:]) #vector!
-#                A5 = np.matmul(np.transpose(self.XY_t[i,:]), A1)  #vector!
-#                A6 = np.matmul(np.identity(self.num_regressors) - A2, 
-#                               self.beta_rt[r,:])  #vector!
-#                
-#                """STEP 2.2: Compute  E_{3,i}, E_4, E_{5,i}, E_{6,i}, E_{7,i} for 
-#                the current value of i"""
-#                E3ider = -self.E3[i] * A1[lower_ind]
-#                E5ider = (2 * 
-#                            np.matmul(
-#                                (
-#                                  np.matmul(A2 - np.identity(self.num_regressors),
-#                                    np.transpose(A3))
-#                                  - A3
-#                                ),
-#                                  self.L_rt[r,:,:]
-#                            )[lower_ind]
-#                        )
-#                E6ider = 2 * pow(alpha, 2) * np.outer(A4, A5)[lower_ind]
-#                E7ider = -2 * alpha * (
-#                            np.outer(A6, A5) 
-#                            + np.matmul(
-#                                np.outer(A4, A6),
-#                                self.L_rt[r,:,:]
-#                            )
-#                        )[lower_ind]
-#                
-#                """STEP 2.3: add the next term to the sum derivative"""
-#                
-#                """STEP 2.3.1: Add the sum-term involving E3ider"""
-#                sum_ders = sum_ders + (
-#                            E3ider 
-#                            * pow(self.b_rt[r]/self.K[i], 
-#                                self.a_rt[r] + 0.5*d*alpha)
-#                            * self.downweight1
-#                            )
-#                
-#                """STEP 2.3.2: Add the sum-term involving E4der - E7ider"""
-#                #RUNTIME OVERFLOW due to  self.K [b^a]
-#                sum_ders = sum_ders + (
-#                            self.E3[i] 
-#                            * (-self.a_rt[r] - 0.5*d*alpha) * 0.5
-#                            * (E4der + E5ider + E6ider + E7ider)
-#                            * pow(self.b_rt[r]/self.K[i], 
-#                                self.a_rt[r] + 0.5*d*alpha + 1)
-#                            * self.downweight2
-#                        )
-#            
-#            """STEP 2.4: Lastly, multiply the sum by E2 (so you have 1 
-#            multiplication instead of 2 * r multiplications)"""
-#            #RUNTIME OVERFLOW due to E2  [b^a]
-#            sum_ders = sum_ders * self.E2_m_ba
-#            
-#            """STEP 2.5: Compute the quantities we can get directly from the 
-#            pre-computations made earlier in this optimization cycle"""
-#            sum_ders = sum_ders + E2der_m_ba * np.sum(
-#                            self.E3  
-#                            * np.power(self.b_rt[r]/self.K, 
-#                                self.a_rt[r] + 0.5 * d * alpha)
-#                            * self.downweight1
-#                        )
-#            
-#            """STEP 3: Add the last remaining term and return everything"""
-#            ELBOder_L = prior_weight*E1der + sum_ders
-#        elif num_obs <= 0:
-#            ELBOder_L = prior_weight*E1der
-#        return ELBOder_L  
-#  
-#    #DEPRECATED
-#    def get_ELBO(self, perturbation, r, num_obs):
-#        """Let perturbation be (p + p*(p+1)*0.5 + 1 + 1) vector of small 
-#        changes for beta, L, a, b"""
-#        
-#        """STEP 1: Perturb the quantities"""
-#        d = self.S1 * self.S2
-#        p = self.num_regressors
-#        lower_ind = np.tril_indices(self.num_regressors, 0) 
-#        beta = (self.beta_rt[r,:] + perturbation[:p]).copy()
-#        L = self.L_rt[r,:,:].copy()
-#        L[lower_ind] = L[lower_ind] + perturbation[p:-2]
-#        Linv = scipy.linalg.lapack.clapack.dtrtri(L, 1)[0]
-#        a = self.a_rt[r] + perturbation[-2]
-#        b = self.b_rt[r] + perturbation[-1]
-#        
-#        
-#        """STEP 2: Compute the E-quantities not depending on observations"""
-##a        print("trace", np.trace(self.L_0_inv), np.trace(L) )
-##        print("direct", np.linalg.slogdet(self.L_0_inv), np.linalg.slogdet(L))
-#
-#        E1 = (- np.log(abs(np.prod(np.diag(self.L_0)))) - np.log(abs(np.prod(np.diag(L)))) 
-#              + 0.5 * (p - np.trace(
-#                              np.matmul(self.prior_var_beta_inv,
-#                                        np.matmul(Linv, 
-#                                                  np.transpose(Linv))
-#                                        )
-#                            )
-#                       ) 
-#            )
-#                                        
-#        E2_m_ba = (np.exp(scipy.special.gammaln(a + d*0.5*self.alpha_param) - 
-#                          scipy.special.gammaln(a)) 
-#                    * (1.0/self.alpha_param)
-#                    * pow(2 * np.pi, -0.5*d*self.alpha_param)
-#                    * abs(np.prod(np.diag(L)))
-#                    ) #np.exp(np.trace(L)))
-#        
-##        print("local", E2_m_ba)
-##        print("global", self.E2_m_ba)
-#        
-#        Ltbeta = np.matmul(np.transpose(L), beta)                              
-#        E4 = np.inner(np.transpose(Ltbeta), Ltbeta)
-#        
-#        #have checked them. These should be correct! 
-#        #{{{{
-#        E8 = -(0.5 
-#              * (1.0/b)
-#              * a #np.exp(scipy.special.gammaln(a + 1) - scipy.special.gammaln(a))
-#              * (np.inner(self.prior_mean_beta - beta ,
-#                          np.matmul(self.prior_var_beta_inv, 
-#                                    self.prior_mean_beta - beta))
-#                 + 2*(self.b - b)
-#                )
-#             )
-#        #E8 = E8 + ((self.b_rt[r] - self.b)* (1.0/b)
-#        #     * np.exp(scipy.special.gammaln(a + 1) - scipy.special.gammaln(a)))
-##        E8old = (0.5 
-##              * (1.0/b)
-##              * np.exp(scipy.special.gammaln(a + 1) - scipy.special.gammaln(a))
-##              * (np.inner(self.prior_mean_beta - beta ,
-##                          np.matmul(self.prior_var_beta_inv, 
-##                                    self.prior_mean_beta - beta))
-##                )
-##             )                
-#        E9 = -(a*np.log(b) + scipy.special.gammaln(self.a) 
-#                - self.a*np.log(self.b) - scipy.special.gammaln(a) )
-#        E10 = -(a - self.a) * (scipy.special.digamma(a) - np.log(b))
-#        E11 =-(  num_obs
-#                * np.exp(scipy.special.gammaln(a + 0.5*d*self.alpha_param) - 
-#                      scipy.special.gammaln(a))
-#                * pow(b*2*np.pi, -0.5*d*self.alpha_param)
-#                * pow(1 + self.alpha_param, -0.5*d - 1)
-#            )
-#        #}}}
-#        
-#        #print("gamma ratio:", np.exp(scipy.special.gammaln(a + 1) - scipy.special.gammaln(a)))
-#        #print("E8", E8) #-1.0000001, -0.99999999
-##        if perturbation[-2]!= 0:
-##            print("E9", E9) #-1
-##            print("E10", E10) # 0
-##            print("E11", E11) #-4
-#
-#        
-#        """STEP 3: Compute data-dependent quantities"""
-#        sum_part = 0.0
-#        if num_obs > 0:
-#            for i in range(0, num_obs):
-#                """QR decomposition of R-matrix (alpha * XX + Sigma_n)"""
-#                Q, R = np.linalg.qr(    
-#                            self.alpha_param * self.XX_t[i,:,:] 
-#                            + np.matmul(L, np.transpose(L))
-#                        )
-#                Rinv = scipy.linalg.lapack.clapack.dtrtri(R, 0)[0]
-#                
-#                """inverse of R-matrix"""
-#                #DEBUG: different from R_inv as stored in object? NO!
-#                R_i_inv = np.matmul(Rinv, np.transpose(Q))
-##                print("local", R_i_inv)
-##                print("object", self.Rinv[i,:,:])
-##                print("R dir", np.matmul(Q, R))
-##                print("R via inv", np.linalg.inv(R_i_inv))
-#                
-#                """Get E3i, i.e. |R|^-0.5. Note that det(Q) = 1 (orthogonality)"""
-#                E3i = pow( abs(np.prod((np.diag(R)))), -0.5)
-##                print("using R", pow( abs(np.prod((np.diag(R)))), -0.5))
-##                print("directly", np.linalg.det(self.alpha_param * self.XX_t[i] 
-##                            + np.matmul(L, np.transpose(L))))
-##                print("stored version", self.E3[i])
-#                
-#                """Get (E4 + E5 + E6 + E7 + alpha * y'y)*0.5 + bn"""
-#                vec = (np.matmul(L, Ltbeta) + self.alpha_param * self.XY_t[i,:])
-#                E4 = np.inner(np.transpose(Ltbeta), Ltbeta)
-#                E5_ = np.matmul(np.transpose(Ltbeta), np.transpose(L))
-#                E5 = -np.matmul(E5_, np.matmul(R_i_inv, np.transpose(E5_)))
-#                #DEBUG: Ensure K > 0 to make comparable to direct gradients
-#                E6 = -pow(self.alpha_param, 2) * np.inner( 
-#                        np.transpose(self.XY_t[i,:]), 
-#                        np.matmul(R_i_inv, self.XY_t[i,:])
-#                    )
-#                E7 = -2 * self.alpha_param * np.matmul(
-#                        np.matmul(
-#                                    np.matmul(np.transpose(Ltbeta), 
-#                                              np.transpose(L)),
-#                                    R_i_inv
-#                                ),
-#                        self.XY_t[i,:]
-#                        )
-#                
-#                term = (b + 0.5 * (
-#                                self.alpha_param * self.YY_t[i]
-#                                + E4
-#                                - np.inner(vec, np.matmul(R_i_inv, vec))
-#                        ))
-#                if perturbation[-2] > 0:
-#                    term = max(term, pow(10,-5))
-#                    
-#                #check if term = K[i]!
-##                print("term", term)
-##                print("Ki", self.K[i])
-#    
-#                """integrate the b^a term into it"""
-#                term_p_ba = (
-#                                pow(b/term, a + 0.5 * d * self.alpha_param) 
-#                                * pow(b, -0.5*d*self.alpha_param)
-#                            )
-#                
-#    #            if self.K[i] != term:
-#    #                print("K and term not same!")
-#    #                print("K[i]", pow(b/self.K[i], a + 0.5 * p * self.alpha_param) 
-#    #                            * pow(b, -0.5*p*self.alpha_param))
-#    #                print("term", term_p_ba)
-#                
-#                
-#    #            print("local", E3i)
-#    #            print("global", self.E3[i])
-#                
-#                """put the term together and add to sum part"""
-#                sum_part = sum_part + term_p_ba * E3i
-#        
-#        return (E1 + E8 + E9 + E10 + E11 + E2_m_ba*sum_part)
-#                
