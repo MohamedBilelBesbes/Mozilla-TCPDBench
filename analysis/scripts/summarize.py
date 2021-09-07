@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
 Summarize the results into a single file per dataset.
 
@@ -84,7 +81,9 @@ def parse_args():
 def load_json(filename):
     with open(filename, "r") as fp:
         try:
-            data = json.load(fp)
+            s = fp.read()
+            s = s[s.find('{'): s.rfind('}') + 1]    # sometimes, abed writes non-sense to the files -> filter it out
+            data = json.loads(s)
         except json.decoder.JSONDecodeError:
             print("Error parsing json file: %s" % filename, file=sys.stderr)
             return {"error": "parsing error"}
@@ -133,7 +132,6 @@ def main():
     for method in sorted(os.listdir(dataset_dir)):
         method_dir = os.path.join(dataset_dir, method)
         for result_file in sorted(os.listdir(method_dir)):
-            # print("Processing result file: %s" % result_file)
             fname = os.path.join(method_dir, result_file)
             result = load_json(fname)
             if not method in out["results"]:
