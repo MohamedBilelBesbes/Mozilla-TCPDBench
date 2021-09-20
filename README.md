@@ -5,18 +5,15 @@ This is a fork of the original [TCPDBench](https://github.com/alan-turing-instit
 1. Create a `Dockerfile` like the following example:
 ```dockerfile
 FROM simont1105/tcpdbench:latest
-# copy the datasets into the benchmark dir, overwrite annotations.json/make_table.py/abed_conf.py
+# copy the datasets into the benchmark dir, overwrite annotations.json
 ADD datasets /TCPDBench/datasets
 COPY annotations.json /TCPDBench/analysis/annotations/
-COPY make_table.py /TCPDBench/analysis/scripts/
-COPY abed_conf.py /TCPDBench/
 # Set the working directory
 WORKDIR TCPDBench
 ```
-2. Inside the Dockerfile directory:
-   1. create a folder `datasets` and store your data in it in this [format](https://github.com/alan-turing-institute/TCPD/blob/master/datasets/bank/bank.json) (`n_dim` must be 1).
+2. Inside the Dockerfile's directory:
+   1. create a folder `datasets` and store your data in it in this [format](https://github.com/alan-turing-institute/TCPD/blob/master/datasets/bank/bank.json) (`n_dim` must be 1 and no missing values allowed).
    2. create a file `annotations.json` and modify it like [this](https://github.com/alan-turing-institute/TCPD/blob/master/annotations.json) for your data.
-   3. create files [abed_conf.py](abed_conf.py) and [make_table.py](analysis/scripts/make_table.py) and configure their `TODOs` according to your datasets.
 3. Run the commands below in the Dockerfile directory to execute the experiments:
 ```shell
 # build a container from your created Dockerfile

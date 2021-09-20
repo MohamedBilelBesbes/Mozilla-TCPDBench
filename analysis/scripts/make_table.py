@@ -25,6 +25,8 @@ import json
 import os
 import sys
 import termcolor
+import glob
+import pathlib
 
 from enum import Enum
 from typing import Optional
@@ -46,11 +48,6 @@ class Experiment(Enum):
     best = "best"
 
 
-class Dataset(Enum):
-    apple = "apple"
-    # TODO: add your datasets!
-
-
 class Method(Enum):
     amoc = "amoc"
     binseg = "binseg"
@@ -69,22 +66,12 @@ class Method(Enum):
     mongodb = "mongodb"
 
 
-# Datasets with missing values
-MISSING_DATASETS = []
-
-# Methods that handle missing values
-MISSING_METHODS = [
-    Method.bocpdms,
-    Method.ecp,
-    Method.kcpa,
-    Method.prophet,
-    Method.zero,
-]
+DATASETS = [d[d.rindex(os.path.sep) + 1:d.rindex('.json')] for d in glob.glob(str(pathlib.Path(__file__).parent.parent.parent.absolute()) + os.path.sep + "datasets" + os.path.sep + "*.json")]
 
 
 @dataclass
 class Result:
-    dataset: Dataset
+    dataset: str
     experiment: Experiment
     method: Method
     metric: Metric
@@ -193,6 +180,8 @@ def collect_results(summary_dir=None, metric=None, experiment=None):
         summary_data = load_summary(path)
 
         dataset_name = summary_data["dataset"]
+        if dataset_name not in DATASETS:
+            raise ValueError("Unknown dataset: %s" % dataset_name)
         summary_results = summary_data["results"]
 
         for method in summary_results:
@@ -213,22 +202,16 @@ def collect_results(summary_dir=None, metric=None, experiment=None):
             # determine the placeholder value if there is no score.
             placeholder = set()
             if score is None:
-                if (Dataset(dataset_name) in MISSING_DATASETS) and (
-                        not Method(method_name) in MISSING_METHODS
-                ):
-                    # dataset has missing values and method can't handle it
-                    placeholder.add("M")
-                else:
-                    for result in summary_results[method]:
-                        if result["status"] == "FAIL":
-                            placeholder.add("F")
-                        elif result["status"] == "TIMEOUT":
-                            placeholder.add("T")
+                for result in summary_results[method]:
+                    if result["status"] == "FAIL":
+                        placeholder.add("F")
+                    elif result["status"] == "TIMEOUT":
+                        placeholder.add("T")
             placeholder = "/".join(sorted(placeholder))
 
             # create a Result object
             res = Result(
-                dataset=Dataset(dataset_name),
+                dataset=dataset_name,
                 experiment=Experiment(experiment),
                 method=Method(method_name),
                 metric=Metric(metric),
@@ -321,7 +304,7 @@ def write_latex(results, dim=None, is_avg=None):
     methods = sorted(set(r.method.name for r in results))
     datasets = sorted(set(r.dataset.name for r in results))
     if dim == "combined":
-        uni_datasets = [d.name for d in list(Dataset)]
+        uni_datasets = DATASETS
         datasets = sorted(uni_datasets)
 
     textsc = lambda m: "\\textsc{%s}" % m
@@ -332,11 +315,10 @@ def write_latex(results, dim=None, is_avg=None):
     table = []
     for dataset in datasets:
         row = [verb(dataset)]
-        d = Dataset(dataset)
 
         for method in methods:
             m = Method(method)
-            r = next((r for r in results if r.method == m and r.dataset == d))
+            r = next((r for r in results if r.method == m and r.dataset == dataset))
             row.append(r.placeholder if r.score is None else r.score)
 
         table.append(row)
