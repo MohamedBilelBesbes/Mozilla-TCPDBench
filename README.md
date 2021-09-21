@@ -10,9 +10,11 @@ ADD datasets /TCPDBench/datasets
 COPY annotations.json /TCPDBench/analysis/annotations/
 # Set the working directory
 WORKDIR TCPDBench
+# Update the datasets in the config files to the added ones
+RUN chmod +x utils/setup_datasets.sh && ./utils/setup_datasets.sh
 ```
 2. Inside the Dockerfile's directory:
-   1. create a folder `datasets` and store your data in it in this [format](https://github.com/alan-turing-institute/TCPD/blob/master/datasets/bank/bank.json) (`n_dim` must be 1 and no missing values allowed).
+   1. create a folder `datasets` and store your datasets (as .json with alphanumeric names!) in it in this [format](https://github.com/alan-turing-institute/TCPD/blob/master/datasets/bank/bank.json) (`n_dim` must be 1 and no missing values allowed).
    2. create a file `annotations.json` and modify it like [this](https://github.com/alan-turing-institute/TCPD/blob/master/annotations.json) for your data.
 3. Run the commands below in the Dockerfile directory to execute the experiments:
 ```shell

@@ -1,7 +1,4 @@
 import copy
-import pathlib
-import glob
-import os
 
 ##############################################################################
 #                                General Settings                            #
@@ -68,7 +65,7 @@ BUILD_CMD = "make all"  # Build command
 DATADIR = "datasets"
 EXECDIR = "execs"
 
-DATASETS = [d[d.rindex(os.path.sep) + 1:d.rindex('.json')] for d in glob.glob(str(pathlib.Path(__file__).parent.absolute()) + os.path.sep + DATADIR + os.path.sep + "*.json")]
+DATASETS = DATASETPLACEHOLDER
 
 DATASET_NAMES = {k: k for k in DATASETS}
 

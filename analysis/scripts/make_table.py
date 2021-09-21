@@ -20,17 +20,16 @@ Date: 2021-08-25
 """
 
 import argparse
-import colorama
 import json
 import os
 import sys
-import termcolor
-import glob
-import pathlib
-
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
-from dataclasses import dataclass
+
+import colorama
+import termcolor
+
 from latex import build_latex_table
 
 colorama.init()
@@ -66,7 +65,7 @@ class Method(Enum):
     mongodb = "mongodb"
 
 
-DATASETS = [d[d.rindex(os.path.sep) + 1:d.rindex('.json')] for d in glob.glob(str(pathlib.Path(__file__).parent.parent.parent.absolute()) + os.path.sep + "datasets" + os.path.sep + "*.json")]
+DATASETS = DATASETPLACEHOLDER
 
 
 @dataclass
