@@ -64,14 +64,7 @@ def load_json(filename):
         return json.load(fp)
 
 
-def make_table(
-    label,
-    uni_default_cover,
-    uni_default_f1,
-    uni_best_cover,
-    uni_best_f1,
-    methods,
-):
+def make_table(uni_default_cover, uni_default_f1, uni_best_cover, uni_best_f1, methods):
     """Create part of the aggregate table
     """
     tex = []
@@ -137,7 +130,7 @@ def make_table(
         row = []
         maxscore = max((exp[m] for m in methods if m in exp))
         for m in methods:
-            if not m in exp:
+            if m not in exp:
                 row.append(5 * " ")
                 continue
             score = exp[m]
@@ -168,7 +161,7 @@ def main():
     dfu = load_json(args.dfu)
 
     methods = sorted([m.name for m in Method])
-    tex = make_table("Wide", dcu, dfu, bcu, bfu, methods)
+    tex = make_table(dcu, dfu, bcu, bfu, methods)
 
     print("\n".join(tex))
 
