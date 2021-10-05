@@ -10,10 +10,6 @@ library(argparse)
 library(prophet)
 library(lubridate)
 
-NO.DATETIME <- c('scanline_126007', 'scanline_42049', 'well_log',
-                 'quality_control_1', 'quality_control_2', 'quality_control_3',
-                 'quality_control_4', 'quality_control_5')
-
 load.utils <- function() {
     # get the name of the current script so we can load utils.R (yay, R!)
     cmd.args <- commandArgs(trailingOnly=F)
@@ -98,7 +94,7 @@ preprocess.data <- function(data)
                 dt <- dt + dseconds(1)
                 tidx <- c(tidx, dt)
             }
-        } else if (data$original$name %in% NO.DATETIME) {
+        } else {
             # these datasets have no corresponding time axis, so we disable 
             # periodicity in prophet for fairness.
             # We'll make it "daily", because prophet needs a datetime format
@@ -108,8 +104,6 @@ preprocess.data <- function(data)
                 dt <- dt + ddays(1)
                 tidx <- c(tidx, dt)
             }
-        } else {
-            stop(cat("Unhandled time series: ", data$original$name, '\n'))
         }
     }
 
@@ -138,7 +132,7 @@ main <- function() {
     else
         args$Nmax <- data$original$n_obs - 1
 
-    if (data$original$name %in% NO.DATETIME) {
+    if (!(data$original$name %in% c('bank', 'bee_waggle'))) {
         defaults$yearly.seasonality <- FALSE
         defaults$weekly.seasonality <- FALSE
         defaults$daily.seasonality <- FALSE
