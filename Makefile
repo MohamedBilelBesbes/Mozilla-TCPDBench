@@ -127,15 +127,13 @@ aggregate_wide: $(TABLE_DIR)/aggregate_table_wide.tex
 $(TABLE_DIR)/aggregate_table_wide.tex: $(SCRIPT_DIR)/aggregate_table_wide.py \
 	$(TABLE_DIR)/best_cover_uni_avg.json \
 	$(TABLE_DIR)/best_f1_uni_avg.json \
-	$(TABLE_DIR)/best_f1_uni_avg.json \
 	$(TABLE_DIR)/default_cover_uni_avg.json \
-	$(TABLE_DIR)/default_f1_uni_avg.json \
 	$(TABLE_DIR)/default_f1_uni_avg.json | table-dir
 	python3.9 $< \
 		--bcu $(TABLE_DIR)/best_cover_uni_avg.json \
 		--bfu $(TABLE_DIR)/best_f1_uni_avg.json \
 		--dcu $(TABLE_DIR)/default_cover_uni_avg.json \
-		--dfu $(TABLE_DIR)/default_f1_uni_avg.json
+		--dfu $(TABLE_DIR)/default_f1_uni_avg.json > $@
 
 
 clean_tables:

@@ -21,10 +21,11 @@ RUN chmod +x utils/setup_datasets.sh && ./utils/setup_datasets.sh
 # build a container from your created Dockerfile
 docker build -t tcpdexperiment .
 # make results persist to host
-mkdir ${HOME}/docker_results
-docker volume create --driver local --opt type=none --opt device=${HOME}/docker_results --opt o=bind tcpdbench_vol
+docker volume create tcpdbench_vol
 # reproduce all experiments (-np sets number of threads)
 docker run -i -t -v tcpdbench_vol:/TCPDBench/docker_results tcpdexperiment /bin/bash -c "abed reload_tasks && abed status && mpiexec --allow-run-as-root -np 4 abed local && make results && cp -r /TCPDBench/abed_results /TCPDBench/docker_results && cp -r /TCPDBench/analysis/output /TCPDBench/docker_results"
+# lookup the mountpoint of the volume --> there the results are stored
+docker volume inspect tcpdbench_vol
 ```
 
 ## License
