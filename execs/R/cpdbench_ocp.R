@@ -83,7 +83,7 @@ main <- function()
 
     start.time <- Sys.time()
     result <- tryCatch({
-        fit <- onlineCPD(data$mat, oCPD=NULL, missPts=params$missPts,
+        capture.output(fit <- onlineCPD(data$mat, oCPD=NULL, missPts=params$missPts,
                          hazard_func=hazard_func, 
                          probModel=list("gaussian"),
                          init_params=model.params,
@@ -94,7 +94,7 @@ main <- function()
                          maxRlength=params$maxRlength,
                          minsep=params$minsep,
                          maxsep=params$maxsep
-                         )
+                         ), file='/dev/null')       # file='NUL' on Windows! Needed because OCP prints data we do not want
         locs <- as.vector(fit$changepoint_lists$maxCPs[[1]])
         list(locations=locs, error=NULL)
     }, error=function(e) {
