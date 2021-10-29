@@ -49,9 +49,9 @@ them to the respective dependency lists.
   version of the package you want to use in the ``Rpackages.txt`` file, for 
   future reference and reproducibility.
 * For Python, individual methods use individual virtual environments, as can 
-  be seen from the bocpdms and rbocpdms examples. These virtual environments 
+  be seen from the examples. These virtual environments 
   need to be activated in the ``COMMANDS`` section of the ``abed_conf.py`` 
   file. Setting up these environments is done through the Makefile. Simply add 
   a ``requirements.txt`` file in your package similarly to what is done for 
-  bocpdms and rbocpdms, copy and edit the corresponding lines in the Makefile, 
+  mongodb, copy and edit the corresponding lines in the Makefile, 
   and run ``make venv_<yourmethod>`` to build the virtual environment.

@@ -279,24 +279,14 @@ clean_constants:
 #             #
 ###############
 
-.PHONY: venv_bocpdms venv_rbocpdms R_venv venvs
+.PHONY: R_venv venvs
 
-venvs: venv_mongodb venv_bocpdms venv_rbocpdms R_venv
+venvs: venv_mongodb R_venv
 
 venv_mongodb: ./execs/python/mongodb/venv
 
 ./execs/python/mongodb/venv:
 	cd execs/python/mongodb && virtualenv -p /usr/bin/python3.9 venv && source venv/bin/activate && pip install -r requirements.txt
-
-venv_bocpdms: ./execs/python/bocpdms/venv
-
-./execs/python/bocpdms/venv:
-	cd execs/python/bocpdms && virtualenv -p /usr/bin/python3.9 venv && source venv/bin/activate && pip install -r requirements.txt
-
-venv_rbocpdms: ./execs/python/rbocpdms/venv
-
-./execs/python/rbocpdms/venv:
-	cd execs/python/rbocpdms && virtualenv -p /usr/bin/python3.9 venv && source venv/bin/activate && pip install -r requirements.txt
 
 R_venv:
 	bash ./utils/R_setup.sh Rpackages.txt ./execs/R/rlibs
@@ -307,8 +297,6 @@ clean_R_venv:
 	rm -f ./.Renviron
 
 clean_venvs: clean_R_venv
-	rm -rf ./execs/python/bocpdms/venv
-	rm -rf ./execs/python/rbocpdms/venv
 	rm -rf ./execs/python/mongodb/venv
 
 ##############

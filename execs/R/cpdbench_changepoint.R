@@ -134,16 +134,16 @@ main <- function()
         exit.with.error(data$original, args, params, result$error)
     }
 
-    # convert indices to 0-based indices.
+    # convert indices to 0-based indices (changepoint is first point of change, not last before!).
     if (params$method == 'AMOC') {
-        locations <- c(result$locations[1]) - 1
+        locations <- c(result$locations[1])
         names(locations) <- NULL
         locations <- as.list(locations)
     } else {
         if (is.list(result$locations)) {
             result$locations <- result$locations$cpts
         }
-        locations <- as.list(result$locations - 1)
+        locations <- as.list(result$locations)
     }
 
     exit.success(data$original, args, params, locations, runtime)

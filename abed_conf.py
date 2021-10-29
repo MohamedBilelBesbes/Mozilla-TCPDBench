@@ -71,8 +71,6 @@ DATASET_NAMES = {k: k for k in DATASETS}
 
 METHODS = [
     "best_bocpd",
-    "best_bocpdms",
-    "best_rbocpdms",
     "best_cpnp",
     "best_pelt",
     "best_amoc",
@@ -86,8 +84,6 @@ METHODS = [
     "best_zero",
     "best_mongodb",
     "default_bocpd",
-    "default_bocpdms",
-    "default_rbocpdms",
     "default_cpnp",
     "default_pelt",
     "default_amoc",
@@ -126,18 +122,6 @@ PARAMS = {
         "prior_a": [0.01, 1.0, 100],
         "prior_b": [0.01, 1.0, 100],
         "prior_k": [0.01, 1.0, 100],
-    },
-    "best_bocpdms": {
-        "intensity": [50, 100, 200],
-        "prior_a": [0.01, 1.0, 100],
-        "prior_b": [0.01, 1.0, 100],
-    },
-    "best_rbocpdms": {
-        "intensity": [50, 100, 200],
-        "prior_a": [0.01, 1.0, 100],
-        "prior_b": [0.01, 1.0, 100],
-        "alpha_param": [0.5],
-        "alpha_rld": [0.5],
     },
     "best_cpnp": {
         "penalty": [
@@ -178,8 +162,6 @@ PARAMS = {
         "permutations": [10, 20, 50, 100, 150, 200],
     },
     "default_bocpd": {"no_param": [0]},
-    "default_bocpdms": {"no_param": [0]},
-    "default_rbocpdms": {"no_param": [0]},
     "default_cpnp": {"no_param": [0]},
     "default_pelt": {"no_param": [0]},
     "default_amoc": {"no_param": [0]},
@@ -206,8 +188,6 @@ COMMANDS = {
     "best_segneigh": "Rscript --no-save --slave {execdir}/R/cpdbench_changepoint.R -i {datadir}/{dataset}.json -p {penalty} -f {function} -t {statistic} -m SegNeigh -Q {Q}",
     "best_wbs": "Rscript --no-save --slave {execdir}/R/cpdbench_wbs.R -i {datadir}/{dataset}.json -K {Kmax} --penalty {penalty} -g {integrated}",
     "best_bocpd": "Rscript --no-save --slave {execdir}/R/cpdbench_ocp.R -i {datadir}/{dataset}.json -l {intensity} --prior-a {prior_a} --prior-b {prior_b} --prior-k {prior_k}",
-    "best_bocpdms": "source {execdir}/python/bocpdms/venv/bin/activate && python {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --use-timeout",
-    "best_rbocpdms": "source {execdir}/python/rbocpdms/venv/bin/activate && python {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity {intensity} --prior-a {prior_a} --prior-b {prior_b} --threshold 100 --alpha-param {alpha_param} --alpha-rld {alpha_rld} --use-timeout",
     "best_zero": "python3.9 {execdir}/python/cpdbench_zero.py -i {datadir}/{dataset}.json",
     "best_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json --pvalue {pvalue} --permutations {permutations}",
     "default_amoc": "Rscript --no-save --slave {execdir}/R/cpdbench_changepoint.R -i {datadir}/{dataset}.json -p MBIC -f mean -t Normal -m AMOC",
@@ -221,8 +201,6 @@ COMMANDS = {
     "default_ecp": "Rscript --no-save --slave {execdir}/R/cpdbench_ecp.R -i {datadir}/{dataset}.json -a e.divisive --alpha 1.0 --minsize 30 --runs 199 --siglvl 0.05",
     "default_kcpa": "Rscript --no-save --slave {execdir}/R/cpdbench_ecp.R -i {datadir}/{dataset}.json -a kcpa -C 1.0 -L max",
     "default_bocpd": "Rscript --no-save --slave {execdir}/R/cpdbench_ocp.R -i {datadir}/{dataset}.json -l 100 --prior-a 1.0 --prior-b 1.0 --prior-k 1.0",
-    "default_bocpdms": "source {execdir}/python/bocpdms/venv/bin/activate && python {execdir}/python/cpdbench_bocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 0",
-    "default_rbocpdms": "source {execdir}/python/rbocpdms/venv/bin/activate && python {execdir}/python/cpdbench_rbocpdms.py -i {datadir}/{dataset}.json --intensity 100 --prior-a 1.0 --prior-b 1.0 --threshold 100 --alpha-param 0.5 --alpha-rld 0.5 --timeout 240",
     "default_zero": "python3.9 {execdir}/python/cpdbench_zero.py -i {datadir}/{dataset}.json",
     "default_mongodb": "source {execdir}/python/mongodb/venv/bin/activate && python {execdir}/python/cpdbench_mongodb.py -i {datadir}/{dataset}.json",
 }

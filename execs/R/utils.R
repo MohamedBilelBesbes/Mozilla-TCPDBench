@@ -120,6 +120,9 @@ prepare.result <- function(data, data.filename, status, error,
     # parameters used
     out$parameters <- params
 
+    # remove changepoints on first (0) and after last data index (n_obs)
+    locations <- locations[which(locations %in% (1:(data$n_obs-1)))]
+
     # result
     out$result <- list(cplocations=locations, runtime=runtime)
 

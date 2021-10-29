@@ -93,7 +93,7 @@ main <- function() {
     }
 
     # convert indices to 0-based
-    locations <- as.list(result$locations - 1)
+    locations <- as.list(result$locations)
 
     exit.success(data$original, args, params, locations, runtime)
 }
