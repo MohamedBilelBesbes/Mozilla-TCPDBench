@@ -4,7 +4,7 @@ This is a fork of the original [TCPDBench](https://github.com/alan-turing-instit
 ## Running the experiments with Docker
 1. Create a `Dockerfile` like the following example:
 ```dockerfile
-FROM simont1105/tcpdbench:latest
+FROM simoneismann/tcpdbench:latest
 # copy the datasets into the benchmark dir, overwrite annotations.json
 ADD datasets /TCPDBench/datasets
 COPY annotations.json /TCPDBench/analysis/annotations/
