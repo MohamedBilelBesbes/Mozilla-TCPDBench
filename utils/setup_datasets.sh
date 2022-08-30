@@ -2,7 +2,7 @@
 
 # create a python array with the dataset names and replace DATASETPLACEHOLDER
 
-DATASET_LIST=(`ls /TCPDBench/datasets | grep '.*\.json' | grep -Eo '^[[:alnum:]]+'`)
+DATASET_LIST=(`ls /TCPDBench/datasets | grep -Po '.+(?=\.json)'`)
 STR='['
 
 for dataset in "${DATASET_LIST[@]}"; do
