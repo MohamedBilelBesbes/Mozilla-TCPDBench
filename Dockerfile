@@ -37,7 +37,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -
 RUN mv /bin/sh /bin/sh.old && cp /bin/bash /bin/sh
 
 # Clone the repo and init venvs
-RUN git clone https://github.com/simontrapp/TCPDBench && cd /TCPDBench && make venvs
+RUN git clone https://github.com/simoneismann/TCPDBench && cd /TCPDBench && make venvs
 # create empty directories for results
 RUN mkdir -p /TCPDBench/analysis/output/summaries && mkdir -p /TCPDBench/abed_results
 # Install Python dependencies
