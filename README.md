@@ -8,8 +8,6 @@ FROM simoneismann/tcpdbench:latest
 # copy the datasets into the benchmark dir, overwrite annotations.json
 ADD datasets /TCPDBench/datasets
 COPY annotations.json /TCPDBench/analysis/annotations/
-# copy the configuration file
-COPY abed_conf.py /TCPDBench/abed_conf.py
 # Set the working directory
 WORKDIR TCPDBench
 # Update the datasets in the config files to the added ones
