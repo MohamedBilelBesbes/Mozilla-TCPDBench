@@ -283,14 +283,14 @@ def write_json(results, is_avg=None):
         datasets = set(r.dataset for r in results)
         methods = set(r.method for r in results)
         for d in datasets:
-            output[d.name] = {}
+            output[d] = {}
             for m in methods:
                 r = next(
                     (r for r in results if r.dataset == d and r.method == m),
                     None,
                 )
                 # intended to fail if r is None, because that shouldn't happen
-                output[d.name][m.name] = r.score
+                output[d][m.name] = r.score
     print(json.dumps(output, indent="\t", sort_keys=True))
 
 
@@ -301,7 +301,7 @@ def write_latex(results, dim=None, is_avg=None):
         )
 
     methods = sorted(set(r.method.name for r in results))
-    datasets = sorted(set(r.dataset.name for r in results))
+    datasets = sorted(set(r.dataset for r in results))
     if dim == "combined":
         uni_datasets = DATASETS
         datasets = sorted(uni_datasets)
